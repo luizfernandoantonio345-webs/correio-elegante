@@ -32,8 +32,10 @@ TOKEN     = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
 BASE_URL  = os.getenv("BASE_URL", "http://localhost:8000").rstrip("/")
 ADMIN_KEY = os.getenv("ADMIN_KEY", "trocar-essa-chave")
 DB_URL    = os.getenv("DATABASE_URL", "sqlite:///correio.db")
-if DB_URL.startswith("postgres://"):                 # Render/Heroku usam esse formato antigo
+if DB_URL.startswith("postgres://"):
     DB_URL = DB_URL.replace("postgres://", "postgresql://", 1)
+if DB_URL.startswith("postgresql://") and "+psycopg2" not in DB_URL:
+    DB_URL = DB_URL.replace("postgresql://", "postgresql+psycopg2://", 1)
 
 API = f"https://api.telegram.org/bot{TOKEN}"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
