@@ -1,0 +1,128 @@
+<!doctype html><html lang="pt-br"><head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Telão · Correio Elegante</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Rye&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{--noite:#15173a;--kraft:#f3e7cf;--fogueira:#ff7a2d;--brasa:#ff3d3d;--milho:#ffc83d;
+    --verde:#3ec46d;--azul:#43b3ff;--rosa:#ff6fae}
+  *{box-sizing:border-box}html,body{margin:0;min-height:100vh}
+  body{font-family:"Outfit",system-ui,sans-serif;color:var(--kraft);padding:22px;
+    background:radial-gradient(1000px 500px at 50% -10%,#2a2c66 0,transparent 60%),
+      radial-gradient(800px 400px at 50% 120%,#3a1230 0,transparent 60%),var(--noite)}
+  .bandeirinhas{height:24px;display:flex;overflow:hidden;animation:balanca 3s ease-in-out infinite}
+  .bandeirinhas i{flex:1 0 24px;height:24px;clip-path:polygon(0 0,100% 0,50% 100%)}
+  .bandeirinhas i:nth-child(5n+1){background:var(--brasa)}.bandeirinhas i:nth-child(5n+2){background:var(--milho)}
+  .bandeirinhas i:nth-child(5n+3){background:var(--verde)}.bandeirinhas i:nth-child(5n+4){background:var(--azul)}
+  .bandeirinhas i:nth-child(5n+5){background:var(--rosa)}
+  @keyframes balanca{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
+  h1{font-family:"Rye",serif;color:var(--milho);font-weight:400;text-align:center;font-size:40px;margin:20px 0 24px;
+    text-shadow:0 3px 0 #b8431b,0 0 30px rgba(255,122,45,.4)}
+  .grid{display:grid;grid-template-columns:1.3fr 1fr;gap:20px;max-width:1100px;margin:0 auto}
+  @media(max-width:780px){.grid{grid-template-columns:1fr}}
+  .placar{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+  .kpi{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:18px;text-align:center}
+  .kpi .n{font-family:"Rye",serif;font-size:48px;color:#fff;line-height:1}
+  .kpi.rosa .n{color:var(--rosa);text-shadow:0 0 22px rgba(255,111,174,.6)}
+  .kpi .l{margin-top:8px;font-size:13px;text-transform:uppercase;letter-spacing:1px;opacity:.8}
+  .bloco{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:20px}
+  .bloco h2{margin:0 0 14px;font-size:16px;text-transform:uppercase;letter-spacing:1px;opacity:.85}
+  .feed{display:flex;flex-direction:column;gap:10px;max-height:54vh;overflow:auto}
+  .ev{display:flex;align-items:center;gap:12px;background:rgba(0,0,0,.18);border-radius:12px;padding:12px 14px}
+  .ev .ico{font-size:22px}.ev b{font-size:16px}.ev small{opacity:.7}
+  .ev .tag{margin-left:auto;font-size:11px;font-weight:800;padding:4px 10px;border-radius:999px}
+  .tag.tg{background:#1d6fd1;color:#fff}.tag.lk{background:var(--milho);color:#3a2c00}
+  .ativar{text-align:center}
+  .ativar .qrwrap{background:#fff;display:inline-block;padding:14px;border-radius:16px;margin:6px 0 12px}
+  .ativar p{font-size:15px;opacity:.9;margin:4px 0}
+  .ativar .passo{font-family:"Rye",serif;color:var(--milho);font-size:20px;margin-top:8px}
+  .vazio{opacity:.6;text-align:center;padding:24px}
+  #tflash{position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;
+    background:radial-gradient(circle,#5a1140,#180312);text-align:center;padding:24px;overflow:hidden}
+  #tflash.show{display:flex;animation:tfin .3s ease}
+  @keyframes tfin{from{opacity:0}to{opacity:1}}
+  #tflash .t{font-family:"Rye",serif;color:#ff9ec7;font-size:30px}
+  #tflash .nome{font-family:"Rye",serif;color:#fff;font-size:64px;margin:10px 0;
+    text-shadow:0 0 30px rgba(255,111,174,.6);animation:pop .5s ease}
+  @media(max-width:640px){#tflash .nome{font-size:42px}}
+  @keyframes pop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+  #tflash .s{color:var(--kraft);font-size:22px;opacity:.9}
+  #tflash .cor{position:absolute;bottom:-40px;animation:up 3.4s ease-in forwards}
+  @keyframes up{to{transform:translateY(-110vh) rotate(18deg);opacity:0}}
+</style></head><body>
+  <div id="tflash"></div>
+  <div class="bandeirinhas" id="band"></div>
+  <h1>💌 Correio Elegante do Arraiá</h1>
+  <div class="grid">
+    <div>
+      <div class="placar">
+        <div class="kpi rosa"><div class="n" id="k-total">0</div><div class="l">Correios</div></div>
+        <div class="kpi"><div class="n" id="k-entregues">0</div><div class="l">Entregues</div></div>
+        <div class="kpi"><div class="n" id="k-reg">0</div><div class="l">No Telegram</div></div>
+      </div>
+      <div class="bloco">
+        <h2>📡 Chegando agora</h2>
+        <div class="feed" id="feed"><div class="vazio">Esperando o primeiro correio… 💕</div></div>
+      </div>
+    </div>
+    <div class="bloco ativar">
+      <h2>📲 Ative seu correio</h2>
+      <div class="qrwrap"><div id="qr-bot"></div></div>
+      <p class="passo">Escaneie e dê /start</p>
+      <p>Assim o correio chega <b>direto no seu celular</b> pelo Telegram!</p>
+      <p id="botname" style="opacity:.6;font-size:13px"></p>
+    </div>
+  </div>
+<script>
+  const band=document.getElementById("band");for(let i=0;i<40;i++)band.appendChild(document.createElement("i"));
+  const $=id=>document.getElementById(id);
+
+  fetch("/api/info").then(r=>r.json()).then(d=>{
+    if(d.bot_username && window.QRCode){
+      const link="https://t.me/"+d.bot_username+"?start=festa";
+      new QRCode($("qr-bot"),{text:link,width:200,height:200});
+      $("botname").textContent="@"+d.bot_username;
+    } else {
+      $("qr-bot").innerHTML="";
+      $("botname").textContent="(configure o bot p/ liberar o Telegram)";
+    }
+  });
+
+  function atualizar(){
+    fetch("/api/telao").then(r=>r.json()).then(d=>{
+      $("k-total").textContent=d.total;
+      $("k-entregues").textContent=d.entregues;
+      $("k-reg").textContent=d.registrados;
+      const feed=$("feed");
+      if(!d.feed.length){ feed.innerHTML='<div class="vazio">Esperando o primeiro correio… 💕</div>'; return; }
+      feed.innerHTML="";
+      d.feed.forEach(c=>{
+        const e=document.createElement("div"); e.className="ev";
+        const tg=c.via==="telegram";
+        e.innerHTML=`<span class="ico">💌</span>
+          <div><b>${c.para}</b><br><small>código ${c.codigo}</small></div>
+          <span class="tag ${tg?'tg':'lk'}">${tg?'TELEGRAM':'QR / LINK'}</span>`;
+        feed.appendChild(e);
+      });
+    }).catch(()=>{});
+  }
+  function esc(s){return (s||"").replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));}
+  let flashT;
+  function flashTelao(nome){
+    const f=$("tflash"); f.className="show";
+    f.innerHTML=`<div><div class="t">💌 Você recebeu um correio!</div>
+      <div class="nome">${esc(nome)}</div>
+      <div class="s">Procure seu código no telão e escaneie pra ler ❤️</div></div>`;
+    for(let i=0;i<14;i++){const h=document.createElement("span");h.className="cor";
+      h.textContent=["❤️","💕","💌","💖"][i%4];h.style.left=(Math.random()*100)+"%";
+      h.style.fontSize=(22+Math.random()*26)+"px";h.style.animationDelay=(Math.random()*.6)+"s";f.appendChild(h);}
+    clearTimeout(flashT); flashT=setTimeout(()=>{f.className="";},4000);
+  }
+  try{
+    const es=new EventSource("/api/stream");
+    es.onmessage=(e)=>{ try{const d=JSON.parse(e.data); if(d&&d.tipo==="novo"){ flashTelao(d.para); atualizar(); }}catch(_){} };
+  }catch(_){}
+
+  atualizar(); setInterval(atualizar,8000);
+</script></body></html>

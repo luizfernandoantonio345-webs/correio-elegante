@@ -1,0 +1,140 @@
+<!doctype html><html lang="pt-br"><head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Você recebeu um correio 💌</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Caveat:wght@600;700&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{--noite:#170d2b;--vinho:#37102e;--papel:#f7eedb;--papel-2:#efe2c6;--tinta:#3a2c1f;
+    --tinta-2:#8a7355;--ouro:#e9b949;--selo:#c2402f;--rosa:#ff9ec7}
+  *{box-sizing:border-box}html,body{margin:0;height:100%}
+  body{font-family:"Outfit",system-ui,sans-serif;color:var(--papel);min-height:100dvh;
+    display:grid;place-items:center;padding:24px;overflow:hidden;position:relative;
+    background:radial-gradient(1000px 700px at 50% 130%,#5a2466 0,transparent 60%),
+      radial-gradient(700px 500px at 85% -10%,#2c1b4d 0,transparent 55%),
+      linear-gradient(160deg,var(--noite),var(--vinho))}
+  /* vinheta */
+  body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:3;
+    box-shadow:inset 0 0 220px 40px rgba(0,0,0,.45)}
+  .vaga{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+  .vaga i{position:absolute;width:5px;height:5px;border-radius:50%;
+    background:radial-gradient(circle,#fff6c8,#ffcf6b);box-shadow:0 0 12px #ffcf6b;
+    animation:flutua linear infinite;opacity:0}
+  @keyframes flutua{0%{transform:translateY(20px);opacity:0}20%{opacity:.9}80%{opacity:.6}
+    100%{transform:translateY(-65vh) translateX(24px);opacity:0}}
+  .palco{position:relative;z-index:2;width:100%;max-width:430px;text-align:center}
+  .chamada{margin-bottom:22px;animation:sobe .7s ease both}
+  .chamada .selo-cima{font-size:12px;letter-spacing:4px;text-transform:uppercase;color:var(--ouro);opacity:.85}
+  .chamada h1{font-family:"Playfair Display",serif;font-weight:700;font-size:26px;margin:10px 0 6px;color:#fff}
+  .chamada p{margin:0;color:var(--rosa);font-size:15px}
+  .cena{perspective:1500px}
+  .envelope{position:relative;width:100%;aspect-ratio:1.5/1;cursor:pointer;
+    filter:drop-shadow(0 28px 46px rgba(0,0,0,.5));transition:transform .5s ease;animation:flutuar 5s ease-in-out infinite}
+  @keyframes flutuar{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+  .envelope:active{transform:scale(.99)}
+  .corpo{position:absolute;inset:0;border-radius:15px;background:linear-gradient(160deg,#82304e,#5d1c38);overflow:hidden}
+  .corpo::before{content:"";position:absolute;inset:0;
+    background:linear-gradient(45deg,transparent 49.5%,rgba(255,255,255,.08) 50%,transparent 50.5%);
+    background-size:15px 15px;opacity:.5}
+  .aba-baixo{position:absolute;inset:0;z-index:3;border-radius:15px;background:linear-gradient(160deg,#8f3656,#6a223f);
+    clip-path:polygon(0 32%,50% 100%,100% 32%,100% 100%,0 100%)}
+  .aba-lado{position:absolute;inset:0;z-index:2;border-radius:15px;background:linear-gradient(160deg,#82304e,#5d1c38);
+    clip-path:polygon(0 0,50% 56%,100% 0,100% 100%,0 100%);opacity:.55}
+  .carta{position:absolute;left:6%;right:6%;bottom:8%;z-index:4;color:var(--tinta);
+    border-radius:11px;padding:24px 22px;text-align:left;box-shadow:0 12px 26px rgba(0,0,0,.32);
+    background:linear-gradient(150deg,var(--papel),var(--papel-2));
+    transform:translateY(8%);opacity:0;transition:.8s cubic-bezier(.2,.8,.2,1) .15s;max-height:62%;overflow:hidden}
+  .carta::before{content:"";position:absolute;inset:0;border-radius:11px;pointer-events:none;
+    background:radial-gradient(120% 60% at 80% 0%,rgba(255,255,255,.5),transparent 60%),
+      repeating-linear-gradient(0deg,transparent 0 27px,rgba(138,115,85,.10) 27px 28px);opacity:.5}
+  .carta .selo-titulo{font-family:"Playfair Display",serif;font-size:13px;letter-spacing:3px;
+    text-transform:uppercase;color:var(--selo);opacity:.75;margin-bottom:10px}
+  .carta .para{font-size:13px;color:var(--tinta-2);margin-bottom:6px}
+  .carta .msg{font-family:"Playfair Display",serif;font-size:19px;line-height:1.5;font-style:italic;color:#322517}
+  .carta .de{font-family:"Caveat",cursive;font-size:26px;margin-top:16px;color:var(--selo);text-align:right}
+  .aba-cima{position:absolute;left:0;right:0;top:0;height:60%;z-index:6;transform-origin:top;
+    background:linear-gradient(160deg,#8f3656,#6a223f);border-radius:15px 15px 0 0;
+    clip-path:polygon(0 0,50% 100%,100% 0);transition:transform .6s ease,z-index 0s .3s}
+  .selo{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);z-index:7;width:58px;height:58px;
+    border-radius:50%;background:radial-gradient(circle at 36% 32%,#e9684f,var(--selo));display:grid;place-items:center;
+    box-shadow:0 5px 12px rgba(0,0,0,.4),inset 0 -3px 6px rgba(0,0,0,.25);
+    font-family:"Playfair Display",serif;font-weight:700;color:#fff3e0;font-size:19px;transition:.45s;overflow:hidden}
+  .selo::after{content:"";position:absolute;inset:0;background:linear-gradient(120deg,transparent 35%,rgba(255,255,255,.5) 50%,transparent 65%);
+    transform:translateX(-120%);animation:brilho 3.2s ease-in-out infinite}
+  @keyframes brilho{0%,60%{transform:translateX(-120%)}80%,100%{transform:translateX(120%)}}
+  .toque{margin-top:18px;color:var(--papel);opacity:.78;font-size:14px;letter-spacing:.5px;animation:pisca 1.8s ease-in-out infinite}
+  @keyframes pisca{50%{opacity:.4}}
+  .hint{margin-top:14px;font-size:13px;color:var(--ouro);opacity:0;transition:opacity .6s .5s}
+  .aberto .aba-cima{transform:rotateX(180deg);z-index:1}
+  .aberto .selo{transform:translate(-50%,-50%) scale(.35);opacity:0}
+  .aberto .carta{transform:translateY(-48%);opacity:1;max-height:none}
+  .aberto .envelope{aspect-ratio:1.16/1;animation:none}
+  .aberto .toque{opacity:0;pointer-events:none}
+  .aberto .hint{opacity:1}
+  .rodape{margin-top:24px;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--ouro);opacity:.6}
+  .erro{color:var(--rosa);font-size:16px;background:rgba(0,0,0,.3);padding:20px;border-radius:14px}
+  .petala{position:fixed;bottom:-40px;z-index:1;pointer-events:none;animation:cai 4s ease-in forwards}
+  @keyframes cai{to{transform:translateY(-115vh) rotate(40deg);opacity:0}}
+  @keyframes sobe{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}
+    .carta{opacity:1;transform:none}.aba-cima{transform:rotateX(180deg)}}
+</style></head><body>
+<div class="vaga" aria-hidden="true"></div>
+<div class="palco">
+  <div class="chamada">
+    <div class="selo-cima">Arraiá TI · Correio Elegante</div>
+    <h1 id="titulo">Você recebeu um correio 💌</h1>
+    <p id="subtitulo">Alguém pensou em você na festa…</p>
+  </div>
+  <div class="cena" id="cena">
+    <div class="envelope" id="envelope" role="button" tabindex="0" aria-label="Abrir correio">
+      <div class="corpo"></div><div class="aba-lado"></div><div class="aba-baixo"></div>
+      <div class="carta">
+        <div class="selo-titulo">Correio Elegante</div>
+        <div class="para" id="c-para">Para você</div>
+        <div class="msg" id="c-msg">…</div>
+        <div class="de" id="c-de">— Anônimo</div>
+      </div>
+      <div class="aba-cima"></div><div class="selo">TI</div>
+    </div>
+  </div>
+  <div class="toque" id="toque">toque no envelope para abrir</div>
+  <div class="hint" id="hint">📸 tire um print pra guardar de recordação</div>
+  <div class="rodape">Festa Junina · Turma de TI</div>
+</div>
+<script>
+(function(){
+  const vaga=document.querySelector(".vaga");
+  for(let i=0;i<20;i++){const f=document.createElement("i");
+    f.style.left=Math.random()*100+"%";f.style.bottom=(-10+Math.random()*30)+"%";
+    f.style.animationDuration=(6+Math.random()*7)+"s";f.style.animationDelay=(Math.random()*7)+"s";vaga.appendChild(f);}
+
+  const codigo=location.pathname.split("/").filter(Boolean).pop();
+  fetch("/api/correios/"+codigo).then(r=>{if(!r.ok)throw 0;return r.json();}).then(d=>{
+    const anon=d.anonimo;
+    document.getElementById("c-para").textContent="Para "+d.para;
+    document.getElementById("c-msg").textContent="“"+d.mensagem+"”";
+    document.getElementById("c-de").textContent="— "+d.de;
+    document.getElementById("subtitulo").textContent=
+      anon ? "Alguém pensou em você na festa…" : d.de+" mandou um correio pra você";
+  }).catch(()=>{
+    document.getElementById("cena").innerHTML=
+      '<div class="erro">Esse correio não foi encontrado 🙈<br>Confira o código com a barraca.</div>';
+    document.getElementById("toque").style.display="none";
+    document.getElementById("titulo").textContent="Hmm…";
+    document.getElementById("subtitulo").textContent="";
+  });
+
+  const env=document.getElementById("envelope");let aberto=false;
+  function petalas(){for(let i=0;i<18;i++){const p=document.createElement("span");p.className="petala";
+    p.textContent=["❤️","💕","🌸","💖","🌼"][i%5];p.style.left=(Math.random()*100)+"%";
+    p.style.fontSize=(16+Math.random()*22)+"px";p.style.animationDelay=(Math.random()*.8)+"s";
+    p.style.animationDuration=(3.2+Math.random()*1.8)+"s";document.body.appendChild(p);
+    setTimeout(()=>p.remove(),5200);}}
+  function abrir(){if(aberto)return;aberto=true;
+    document.querySelector(".palco").classList.add("aberto");petalas();}
+  env.addEventListener("click",abrir);
+  env.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();abrir();}});
+})();
+</script></body></html>

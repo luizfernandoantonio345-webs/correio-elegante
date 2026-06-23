@@ -1,0 +1,62 @@
+<!doctype html><html lang="pt-br"><head>
+<meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Moderação · Correio</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  body{font-family:"Outfit",system-ui,sans-serif;background:#15173a;color:#f3e7cf;margin:0;padding:22px}
+  .wrap{max-width:720px;margin:0 auto}
+  h1{font-size:22px;margin:0 0 16px}
+  .barra{display:flex;gap:8px;margin-bottom:18px}
+  input{flex:1;font:inherit;padding:11px 13px;border-radius:10px;border:1.5px solid rgba(255,255,255,.18);background:#1f2150;color:#fff}
+  button{font:inherit;font-weight:700;border:0;border-radius:10px;padding:11px 16px;cursor:pointer;background:#ff7a2d;color:#fff}
+  .item{background:#1f2150;border:1px solid rgba(255,255,255,.1);border-radius:13px;padding:14px;margin-bottom:10px}
+  .item.oc{border-color:#ff3d3d;opacity:.7}
+  .top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}
+  .cod{font-weight:800;color:#ffc83d}
+  .msg{font-size:15px;line-height:1.4}.meta{font-size:12px;opacity:.6;margin-top:6px}
+  .quem{font-size:12px;margin-top:8px;padding:8px 10px;border-radius:8px;background:rgba(255,200,61,.12);color:#ffd98a}
+  .flag{font-size:11px;font-weight:700;background:#ff3d3d;color:#fff;padding:2px 8px;border-radius:999px;margin-left:6px}
+  .acao{background:#3a3c70;font-size:13px;padding:8px 12px}
+  .acao.mostrar{background:#3ec46d}.acao.ocultar{background:#ff3d3d}
+  .vazio{opacity:.6;text-align:center;padding:30px}
+</style></head><body>
+<div class="wrap">
+  <h1>🛡️ Moderação dos Correios</h1>
+  <div class="barra">
+    <input id="key" type="password" placeholder="Chave de moderação (ADMIN_KEY)" />
+    <button id="entrar">Entrar</button>
+  </div>
+  <div id="lista"></div>
+</div>
+<script>
+  const $=id=>document.getElementById(id);
+  let KEY="";
+  $("entrar").onclick=()=>{ KEY=$("key").value.trim(); carregar(); };
+  async function carregar(){
+    if(!KEY) return;
+    try{
+      const r=await fetch("/api/admin/correios?key="+encodeURIComponent(KEY));
+      if(!r.ok){ $("lista").innerHTML='<div class="vazio">Chave inválida.</div>'; return; }
+      const cs=await r.json();
+      if(!cs.length){ $("lista").innerHTML='<div class="vazio">Nenhum correio ainda.</div>'; return; }
+      $("lista").innerHTML="";
+      cs.forEach(c=>{
+        const d=document.createElement("div"); d.className="item"+(c.oculto?" oc":"");
+        const flag = c.termos ? `<span class="flag">⚠️ ${esc(c.termos)}</span>` : "";
+        d.innerHTML=`<div class="top"><span class="cod">${c.codigo} ${flag}</span>
+          <button class="acao ${c.oculto?'mostrar':'ocultar'}">${c.oculto?'Mostrar':'Ocultar'}</button></div>
+          <div class="msg"><b>Para ${esc(c.para)}:</b> “${esc(c.mensagem)}”</div>
+          <div class="meta">Aparece como “${esc(c.de)}” · via ${c.via} · ${c.entregue?'entregue':'pendente'}</div>
+          <div class="quem">👤 Enviado por: <b>${esc(c.remetente_real||"—")}</b>
+            · IP ${esc(c.ip||"—")} · ${esc(c.quando||"")}</div>`;
+        d.querySelector("button").onclick=()=>toggle(c.codigo,!c.oculto);
+        $("lista").appendChild(d);
+      });
+    }catch(e){}
+  }
+  async function toggle(codigo,ocultar){
+    await fetch(`/api/admin/ocultar/${codigo}?key=${encodeURIComponent(KEY)}&ocultar=${ocultar}`,{method:"POST"});
+    carregar();
+  }
+  function esc(s){return (s||"").replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));}
+</script></body></html>
