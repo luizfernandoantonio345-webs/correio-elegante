@@ -370,6 +370,17 @@ def admin_registrar_usuario(key: str, chat_id: int, codinome: str, username: str
         s.commit()
         return {"chat_id": u.chat_id, "codinome": u.codinome, "ok": True}
 
+@app.get("/api/destinatarios")
+def destinatarios():
+    """Lista publica de codinomes/usernames para autocomplete na barraca."""
+    with Session(engine) as s:
+        us = s.scalars(select(Usuario).where(Usuario.aguardando_codinome == False)).all()
+        nomes = []
+        for u in us:
+            if u.codinome: nomes.append(u.codinome)
+            if u.username: nomes.append("@" + u.username)
+        return sorted(set(nomes))
+
 @app.get("/api/admin/usuarios")
 def admin_usuarios(key: str):
     checa_admin(key)

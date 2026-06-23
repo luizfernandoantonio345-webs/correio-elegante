@@ -5,112 +5,533 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Rye&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 <style>
-  :root{--noite:#15173a;--kraft:#f3e7cf;--fogueira:#ff7a2d;--brasa:#ff3d3d;--milho:#ffc83d;
-    --verde:#3ec46d;--azul:#43b3ff;--rosa:#ff6fae;--tinta:#23224a;--tinta-2:#52527a;--linha:rgba(35,34,74,.12)}
-  *{box-sizing:border-box}html,body{margin:0}
-  body{font-family:"Outfit",system-ui,sans-serif;color:var(--tinta);min-height:100vh;
-    background:radial-gradient(1200px 500px at 80% -10%,#2a2c66 0,transparent 60%),var(--noite);padding:20px}
+  :root{
+    --noite:#15173a;--kraft:#f3e7cf;--fogueira:#ff7a2d;--brasa:#ff3d3d;
+    --milho:#ffc83d;--verde:#3ec46d;--azul:#43b3ff;--rosa:#ff6fae;
+    --tinta:#23224a;--tinta-2:#52527a;--linha:rgba(35,34,74,.12)
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    font-family:"Outfit",system-ui,sans-serif;color:var(--tinta);min-height:100vh;
+    background:radial-gradient(1200px 500px at 80% -10%,#2a2c66 0,transparent 60%),var(--noite);
+    padding:20px 16px 40px
+  }
+
+  /* Bandeirinhas */
   .bandeirinhas{height:22px;display:flex;overflow:hidden;border-radius:6px;margin-bottom:18px}
   .bandeirinhas i{flex:1 0 22px;height:22px;clip-path:polygon(0 0,100% 0,50% 100%)}
-  .bandeirinhas i:nth-child(5n+1){background:var(--brasa)}.bandeirinhas i:nth-child(5n+2){background:var(--milho)}
-  .bandeirinhas i:nth-child(5n+3){background:var(--verde)}.bandeirinhas i:nth-child(5n+4){background:var(--azul)}
+  .bandeirinhas i:nth-child(5n+1){background:var(--brasa)}
+  .bandeirinhas i:nth-child(5n+2){background:var(--milho)}
+  .bandeirinhas i:nth-child(5n+3){background:var(--verde)}
+  .bandeirinhas i:nth-child(5n+4){background:var(--azul)}
   .bandeirinhas i:nth-child(5n+5){background:var(--rosa)}
-  .wrap{max-width:460px;margin:0 auto}
-  h1{font-family:"Rye",serif;color:var(--milho);font-weight:400;font-size:28px;text-align:center;margin:0 0 4px;
-    text-shadow:0 2px 0 #b8431b}
+
+  .wrap{max-width:480px;margin:0 auto}
+
+  h1{
+    font-family:"Rye",serif;color:var(--milho);font-weight:400;font-size:28px;
+    text-align:center;margin:0 0 4px;text-shadow:0 2px 0 #b8431b
+  }
   .sub{text-align:center;color:var(--kraft);opacity:.7;font-size:14px;margin-bottom:20px}
-  .cartao{background:var(--kraft);border-radius:18px;padding:22px;box-shadow:0 10px 30px rgba(21,23,58,.18);position:relative;overflow:hidden}
-  .cartao::before{content:"";position:absolute;inset:0 0 auto 0;height:5px;
-    background:linear-gradient(90deg,var(--brasa),var(--milho),var(--verde),var(--azul),var(--rosa))}
+
+  /* Card principal */
+  .cartao{
+    background:var(--kraft);border-radius:18px;padding:22px 20px;
+    box-shadow:0 10px 30px rgba(21,23,58,.22);position:relative;overflow:hidden
+  }
+  .cartao::before{
+    content:"";position:absolute;inset:0 0 auto 0;height:5px;
+    background:linear-gradient(90deg,var(--brasa),var(--milho),var(--verde),var(--azul),var(--rosa))
+  }
+
   label{display:block;font-weight:600;font-size:13px;margin:14px 0 6px}
-  input,textarea{width:100%;font:inherit;font-size:16px;padding:12px 13px;border-radius:11px;border:1.5px solid var(--linha);background:#fff;color:var(--tinta)}
-  input:focus,textarea:focus{outline:none;border-color:var(--fogueira);box-shadow:0 0 0 3px rgba(255,122,45,.18)}
-  textarea{resize:vertical;min-height:80px}
+
+  /* Inputs com micro-animação de foco */
+  input,textarea{
+    width:100%;font:inherit;font-size:16px;padding:12px 13px;border-radius:11px;
+    border:1.5px solid var(--linha);background:#fff;color:var(--tinta);
+    transition:border-color .2s,box-shadow .2s,transform .15s
+  }
+  input:focus,textarea:focus{
+    outline:none;border-color:var(--fogueira);
+    box-shadow:0 0 0 4px rgba(255,122,45,.18);
+    transform:translateY(-1px)
+  }
+  textarea{resize:vertical;min-height:100px}
+
+  /* Para field row com badge */
+  .para-row{position:relative}
+  .badge-tg{
+    display:none;align-items:center;gap:5px;margin-top:6px;
+    font-size:12px;font-weight:700;color:#1d6fd1;
+    background:#d6ecff;padding:3px 10px;border-radius:999px;
+    width:fit-content
+  }
+  .badge-tg.show{display:flex}
+
+  /* Templates de mensagem */
+  .templates{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px}
+  .chip{
+    font:inherit;font-size:12px;font-weight:600;cursor:pointer;
+    padding:6px 12px;border-radius:999px;border:1.5px solid rgba(255,122,45,.35);
+    background:rgba(255,122,45,.07);color:var(--tinta);
+    transition:background .15s,border-color .15s,transform .1s;white-space:nowrap
+  }
+  .chip:hover{background:rgba(255,122,45,.18);border-color:var(--fogueira);transform:translateY(-1px)}
+  .chip:active{transform:translateY(0)}
+
+  /* Emojis rápidos */
+  .emoji-row{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px}
+  .emoji-btn{
+    font-size:20px;background:none;border:1.5px solid transparent;border-radius:8px;
+    padding:3px 5px;cursor:pointer;transition:background .12s,border-color .12s,transform .1s;
+    line-height:1
+  }
+  .emoji-btn:hover{background:rgba(255,122,45,.12);border-color:rgba(255,122,45,.3);transform:scale(1.2)}
+  .emoji-btn:active{transform:scale(1)}
+
+  /* Contador de caracteres */
+  .msg-meta{display:flex;justify-content:space-between;align-items:center;margin-top:4px}
+  .char-count{font-size:11px;font-weight:600;color:var(--tinta-2);transition:color .2s}
+  .char-count.quase{color:var(--fogueira)}
+  .char-count.cheio{color:var(--brasa)}
+
   .linha-anon{display:flex;align-items:center;gap:10px;margin-top:16px;font-weight:600;font-size:14px}
   .linha-anon input{width:auto}
-  .botao{margin-top:18px;width:100%;border:0;cursor:pointer;font:inherit;font-weight:800;font-size:17px;color:#fff;
-    padding:14px;border-radius:13px;background:linear-gradient(180deg,var(--rosa),#e2528d);box-shadow:0 8px 18px rgba(226,82,141,.35)}
-  .botao:active{transform:translateY(1px)}
-  .dica{color:var(--tinta-2);font-size:12px;margin:8px 2px 0}
-  /* resultado */
-  #resultado{display:none;text-align:center;margin-top:18px;animation:sobe .3s ease}
-  #resultado .cod{font-family:"Rye",serif;color:var(--brasa);font-size:32px}
-  #resultado .via{display:inline-block;margin:8px 0;padding:6px 14px;border-radius:999px;font-weight:800;font-size:13px}
-  .via.tg{background:#d6ecff;color:#1d6fd1}.via.lk{background:#fff0cf;color:#9a6b00}.via.mod{background:#ffd9d9;color:#c23a0e}
-  #qr{display:flex;justify-content:center;margin:12px 0}#qr canvas,#qr img{background:#fff;padding:10px;border-radius:12px}
-  #resultado a.link{display:block;color:var(--tinta-2);font-size:12px;word-break:break-all;margin-top:6px}
-  .novo{margin-top:14px;background:#fff;border:1.5px solid var(--linha);border-radius:11px;padding:11px;font:inherit;font-weight:700;cursor:pointer;width:100%}
-  @keyframes sobe{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-</style></head><body>
+
+  /* Botão com hover lift */
+  .botao{
+    margin-top:18px;width:100%;border:0;cursor:pointer;font:inherit;font-weight:800;
+    font-size:17px;color:#fff;padding:15px;border-radius:13px;
+    background:linear-gradient(180deg,var(--rosa),#e2528d);
+    box-shadow:0 8px 18px rgba(226,82,141,.35);
+    transition:transform .15s,box-shadow .15s
+  }
+  .botao:hover{transform:translateY(-2px);box-shadow:0 12px 24px rgba(226,82,141,.45)}
+  .botao:active{transform:translateY(1px);box-shadow:0 4px 10px rgba(226,82,141,.3)}
+  .botao:disabled{opacity:.65;cursor:not-allowed;transform:none}
+
+  .dica{color:var(--tinta-2);font-size:12px;margin:8px 2px 0;line-height:1.5}
+
+  /* Resultado */
+  #resultado{display:none;text-align:center;margin-top:4px}
+  #resultado .cod{font-family:"Rye",serif;color:var(--brasa);font-size:36px}
+  #resultado .via{
+    display:inline-block;margin:8px 0;padding:6px 14px;
+    border-radius:999px;font-weight:800;font-size:13px
+  }
+  .via.tg{background:#d6ecff;color:#1d6fd1}
+  .via.lk{background:#fff0cf;color:#9a6b00}
+  .via.mod{background:#ffd9d9;color:#c23a0e}
+  #qr{display:flex;justify-content:center;margin:12px 0}
+  #qr canvas,#qr img{background:#fff;padding:10px;border-radius:12px}
+  #resultado a.link{display:block;color:var(--tinta-2);font-size:11px;word-break:break-all;margin-top:6px}
+
+  /* Botões de ação do resultado */
+  .resultado-acoes{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+  .resultado-acoes button{
+    flex:1;min-width:120px;font:inherit;font-size:13px;font-weight:700;cursor:pointer;
+    padding:10px 8px;border-radius:11px;border:1.5px solid var(--linha);
+    background:#fff;color:var(--tinta);transition:transform .12s,box-shadow .12s
+  }
+  .resultado-acoes button:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.1)}
+  .novo{
+    margin-top:10px;background:#fff;border:1.5px solid var(--linha);
+    border-radius:11px;padding:11px;font:inherit;font-weight:700;cursor:pointer;width:100%;
+    transition:transform .12s,box-shadow .12s
+  }
+  .novo:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.1)}
+
+  /* Animação do resultado (slide up) */
+  @keyframes slideUp{
+    from{opacity:0;transform:translateY(16px)}
+    to{opacity:1;transform:translateY(0)}
+  }
+  .slide-up{animation:slideUp .35s cubic-bezier(.22,1,.36,1)}
+
+  /* Confetti canvas */
+  #confetti-canvas{
+    position:fixed;inset:0;pointer-events:none;z-index:9999;width:100%;height:100%
+  }
+
+  /* Mobile */
+  @media(max-width:480px){
+    body{padding:14px 10px 30px}
+    .cartao{padding:18px 14px}
+    h1{font-size:24px}
+    input,textarea{font-size:17px;padding:13px 12px}
+    .botao{font-size:16px;padding:16px}
+    .emoji-btn{font-size:22px;padding:5px 6px}
+    .chip{font-size:13px;padding:8px 13px}
+    .resultado-acoes{flex-direction:column}
+    .resultado-acoes button{min-width:unset}
+  }
+</style>
+</head><body>
+<canvas id="confetti-canvas"></canvas>
 <div class="wrap">
   <div class="bandeirinhas" id="band"></div>
   <h1>Correio Elegante</h1>
-  <div class="sub">Barraca · Turma de TI</div>
+  <div class="sub">Barraca · Arraiá TI</div>
   <div class="cartao">
     <div id="form">
+
+      <!-- Para -->
       <label for="para">Para quem é? (nome, turma ou @ do Telegram)</label>
-      <input id="para" placeholder="Ex.: Ana 3ºB  ou  @ana" autocomplete="off" />
+      <div class="para-row">
+        <input id="para" list="destinatarios-list" placeholder="Ex.: Ana 3ºB  ou  @ana" autocomplete="off" />
+        <datalist id="destinatarios-list"></datalist>
+        <div class="badge-tg" id="badge-tg">✓ no Telegram</div>
+      </div>
+
+      <!-- Mensagem -->
       <label for="msg">Mensagem</label>
-      <textarea id="msg" placeholder="Escreva o correio…"></textarea>
+      <div class="templates" id="templates">
+        <button type="button" class="chip" data-msg="Você ilumina o Arraiá! ☀️">Você ilumina o Arraiá! ☀️</button>
+        <button type="button" class="chip" data-msg="Tenho algo pra te contar... 🤫">Tenho algo pra te contar... 🤫</button>
+        <button type="button" class="chip" data-msg="Você é incrível, sabia? 💫">Você é incrível, sabia? 💫</button>
+        <button type="button" class="chip" data-msg="Sorria, alguém tá pensando em você 💌">Sorria, alguém tá pensando em você 💌</button>
+      </div>
+      <div class="emoji-row" id="emoji-row">
+        <button type="button" class="emoji-btn" data-emoji="❤️">❤️</button>
+        <button type="button" class="emoji-btn" data-emoji="💕">💕</button>
+        <button type="button" class="emoji-btn" data-emoji="😊">😊</button>
+        <button type="button" class="emoji-btn" data-emoji="🌟">🌟</button>
+        <button type="button" class="emoji-btn" data-emoji="🎉">🎉</button>
+        <button type="button" class="emoji-btn" data-emoji="🌻">🌻</button>
+        <button type="button" class="emoji-btn" data-emoji="💫">💫</button>
+        <button type="button" class="emoji-btn" data-emoji="🙈">🙈</button>
+        <button type="button" class="emoji-btn" data-emoji="🔥">🔥</button>
+        <button type="button" class="emoji-btn" data-emoji="🥰">🥰</button>
+        <button type="button" class="emoji-btn" data-emoji="✨">✨</button>
+        <button type="button" class="emoji-btn" data-emoji="🌹">🌹</button>
+      </div>
+      <textarea id="msg" placeholder="Escreva o correio…" maxlength="400"></textarea>
+      <div class="msg-meta">
+        <span></span>
+        <span class="char-count" id="char-count">0 / 400</span>
+      </div>
+
+      <!-- De -->
       <label for="de">De (como aparece pra quem recebe)</label>
       <input id="de" placeholder="Seu nome (ou deixe anônimo)" autocomplete="off" />
+
+      <!-- Remetente real -->
       <label for="remetente">Quem está enviando? <span style="color:var(--brasa)">*</span>
         <small style="font-weight:400;color:var(--tinta-2)">— registro interno, ninguém vê</small></label>
       <input id="remetente" placeholder="Seu nome e turma, ex.: Luiz 3ºA" autocomplete="off" />
+
       <div class="linha-anon">
         <input type="checkbox" id="anon" checked />
         <label for="anon" style="margin:0">Enviar anônimo 🎭</label>
       </div>
+
       <button class="botao" id="enviar">Gerar correio 💌</button>
       <p class="dica">🔒 Anônimo só pra quem recebe. A organização registra quem enviou, por segurança.</p>
       <p class="dica">Se a pessoa ativou o bot do Telegram, chega no celular dela na hora. Senão, entregue o código/QR.</p>
     </div>
+
+    <!-- Resultado -->
     <div id="resultado">
       <div class="cod" id="r-cod">CE-0000</div>
       <div class="via" id="r-via">—</div>
       <div id="qr"></div>
       <a class="link" id="r-link" href="#" target="_blank">—</a>
+      <div class="resultado-acoes">
+        <button id="btn-baixar-qr">📥 Baixar QR</button>
+        <button id="btn-copiar-link">📋 Copiar link</button>
+      </div>
       <button class="novo" id="novo">+ Novo correio</button>
     </div>
   </div>
 </div>
+
 <script>
-  const band=document.getElementById("band");for(let i=0;i<24;i++)band.appendChild(document.createElement("i"));
-  const $=id=>document.getElementById(id);
+// ── Bandeirinhas ──────────────────────────────────────────────────────────────
+const band = document.getElementById("band");
+for (let i = 0; i < 24; i++) band.appendChild(document.createElement("i"));
 
-  $("anon").addEventListener("change",()=>{ $("de").disabled=$("anon").checked; });
-  $("de").disabled=true;
+const $ = id => document.getElementById(id);
 
-  $("enviar").onclick=async()=>{
-    const para=$("para").value.trim(), msg=$("msg").value.trim(), remetente=$("remetente").value.trim();
-    if(!para||!msg){ alert("Preencha o destinatário e a mensagem."); return; }
-    if(!remetente){ alert("Identifique quem está enviando (registro interno)."); $("remetente").focus(); return; }
-    $("enviar").disabled=true; $("enviar").textContent="Gerando…";
-    try{
-      const r=await fetch("/api/correios",{method:"POST",headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({para,mensagem:msg,de:$("de").value.trim(),
-          anonimo:$("anon").checked,remetente_real:remetente})});
-      const d=await r.json();
-      if(!r.ok) throw new Error(d.detail||"erro");
-      mostrar(d);
-    }catch(e){ alert("Deu erro: "+e.message); }
-    $("enviar").disabled=false; $("enviar").textContent="Gerar correio 💌";
-  };
+// ── Destinatários (autocomplete + badge Telegram) ─────────────────────────────
+let destinatarios = [];
+fetch("/api/destinatarios")
+  .then(r => r.json())
+  .then(lista => {
+    destinatarios = lista;
+    const dl = $("destinatarios-list");
+    lista.forEach(nome => {
+      const opt = document.createElement("option");
+      opt.value = nome;
+      dl.appendChild(opt);
+    });
+  })
+  .catch(() => {});
 
-  function mostrar(d){
-    $("form").style.display="none"; $("resultado").style.display="block";
-    $("r-cod").textContent=d.codigo;
-    const via=$("r-via");
-    if(d.oculto){ via.className="via mod"; via.textContent="⚠️ Retido p/ moderação"; }
-    else if(d.telegram){ via.className="via tg"; via.textContent="✅ Enviado no Telegram!"; }
-    else { via.className="via lk"; via.textContent="📲 Entregue por QR / link"; }
-    $("qr").innerHTML="";
-    if(!d.oculto && window.QRCode) new QRCode($("qr"),{text:d.link,width:180,height:180,correctLevel:QRCode.CorrectLevel.M});
-    $("r-link").textContent=d.link; $("r-link").href=d.link;
+$("para").addEventListener("input", () => {
+  const val = $("para").value.trim().toLowerCase();
+  const badge = $("badge-tg");
+  const encontrado = destinatarios.some(d => d.toLowerCase() === val);
+  badge.classList.toggle("show", encontrado && val.length > 0);
+});
+
+// ── Templates de mensagem ─────────────────────────────────────────────────────
+document.getElementById("templates").addEventListener("click", e => {
+  const chip = e.target.closest(".chip");
+  if (!chip) return;
+  const ta = $("msg");
+  const txt = chip.dataset.msg;
+  const start = ta.selectionStart;
+  const end = ta.selectionEnd;
+  const before = ta.value.substring(0, start);
+  const after = ta.value.substring(end);
+  const novo = before ? before + " " + txt : txt;
+  ta.value = (novo + after).substring(0, 400);
+  ta.focus();
+  const pos = novo.length;
+  ta.setSelectionRange(pos, pos);
+  atualizarContador();
+  salvarRascunho();
+});
+
+// ── Emojis rápidos ────────────────────────────────────────────────────────────
+document.getElementById("emoji-row").addEventListener("click", e => {
+  const btn = e.target.closest(".emoji-btn");
+  if (!btn) return;
+  const emoji = btn.dataset.emoji;
+  const ta = $("msg");
+  const start = ta.selectionStart;
+  const end = ta.selectionEnd;
+  const before = ta.value.substring(0, start);
+  const after = ta.value.substring(end);
+  const novo = (before + emoji + after).substring(0, 400);
+  ta.value = novo;
+  ta.focus();
+  const pos = start + emoji.length;
+  ta.setSelectionRange(pos, pos);
+  atualizarContador();
+  salvarRascunho();
+});
+
+// ── Contador de caracteres ────────────────────────────────────────────────────
+function atualizarContador() {
+  const len = $("msg").value.length;
+  const el = $("char-count");
+  el.textContent = len + " / 400";
+  el.className = "char-count" + (len >= 400 ? " cheio" : len >= 340 ? " quase" : "");
+}
+$("msg").addEventListener("input", () => { atualizarContador(); salvarRascunho(); });
+
+// ── LocalStorage rascunho ─────────────────────────────────────────────────────
+const DRAFT_KEY = "ce_draft";
+function salvarRascunho() {
+  try {
+    localStorage.setItem(DRAFT_KEY, JSON.stringify({
+      para: $("para").value,
+      msg: $("msg").value,
+      remetente: $("remetente").value
+    }));
+  } catch (_) {}
+}
+function carregarRascunho() {
+  try {
+    const d = JSON.parse(localStorage.getItem(DRAFT_KEY) || "null");
+    if (!d) return;
+    if (d.para) $("para").value = d.para;
+    if (d.msg) { $("msg").value = d.msg; atualizarContador(); }
+    if (d.remetente) $("remetente").value = d.remetente;
+  } catch (_) {}
+}
+$("para").addEventListener("input", salvarRascunho);
+$("remetente").addEventListener("input", salvarRascunho);
+carregarRascunho();
+
+// ── Checkbox anônimo ──────────────────────────────────────────────────────────
+$("anon").addEventListener("change", () => { $("de").disabled = $("anon").checked; });
+$("de").disabled = true;
+
+// ── Envio ─────────────────────────────────────────────────────────────────────
+$("enviar").onclick = async () => {
+  const para = $("para").value.trim();
+  const msg = $("msg").value.trim();
+  const remetente = $("remetente").value.trim();
+  if (!para || !msg) { alert("Preencha o destinatário e a mensagem."); return; }
+  if (!remetente) { alert("Identifique quem está enviando (registro interno)."); $("remetente").focus(); return; }
+  $("enviar").disabled = true;
+  $("enviar").textContent = "Gerando…";
+  try {
+    const r = await fetch("/api/correios", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        para, mensagem: msg,
+        de: $("de").value.trim(),
+        anonimo: $("anon").checked,
+        remetente_real: remetente
+      })
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.detail || "erro");
+    // Limpa rascunho após envio
+    try { localStorage.removeItem(DRAFT_KEY); } catch (_) {}
+    mostrar(d);
+    dispararConfetti();
+  } catch (e) {
+    alert("Deu erro: " + e.message);
   }
-  $("novo").onclick=()=>{
-    ["para","msg","de","remetente"].forEach(id=>$(id).value="");
-    $("anon").checked=true; $("de").disabled=true;
-    $("resultado").style.display="none"; $("form").style.display="block"; $("para").focus();
+  $("enviar").disabled = false;
+  $("enviar").textContent = "Gerar correio 💌";
+};
+
+// ── Exibir resultado ──────────────────────────────────────────────────────────
+let ultimoLink = "";
+let qrCanvas = null;
+
+function mostrar(d) {
+  $("form").style.display = "none";
+  const res = $("resultado");
+  res.style.display = "block";
+  res.classList.remove("slide-up");
+  // Trigger reflow para reiniciar animação
+  void res.offsetWidth;
+  res.classList.add("slide-up");
+
+  $("r-cod").textContent = d.codigo;
+  const via = $("r-via");
+  if (d.oculto) {
+    via.className = "via mod"; via.textContent = "⚠️ Retido p/ moderação";
+  } else if (d.telegram) {
+    via.className = "via tg"; via.textContent = "✅ Enviado no Telegram!";
+  } else {
+    via.className = "via lk"; via.textContent = "📲 Entregue por QR / link";
+  }
+  $("qr").innerHTML = "";
+  qrCanvas = null;
+  ultimoLink = d.link || "";
+  if (!d.oculto && window.QRCode) {
+    new QRCode($("qr"), { text: d.link, width: 180, height: 180, correctLevel: QRCode.CorrectLevel.M });
+    // Captura o canvas gerado pelo QRCode
+    setTimeout(() => {
+      qrCanvas = $("qr").querySelector("canvas");
+    }, 100);
+  }
+  $("r-link").textContent = d.link;
+  $("r-link").href = d.link;
+}
+
+// ── Baixar QR ────────────────────────────────────────────────────────────────
+$("btn-baixar-qr").onclick = () => {
+  const canvas = qrCanvas || ($("qr").querySelector("canvas"));
+  if (!canvas) { alert("QR ainda não disponível."); return; }
+  const link = document.createElement("a");
+  link.download = "correio-qr.png";
+  link.href = canvas.toDataURL("image/png");
+  link.click();
+};
+
+// ── Copiar link ───────────────────────────────────────────────────────────────
+$("btn-copiar-link").onclick = async () => {
+  if (!ultimoLink) return;
+  try {
+    await navigator.clipboard.writeText(ultimoLink);
+    const btn = $("btn-copiar-link");
+    btn.textContent = "✅ Copiado!";
+    setTimeout(() => { btn.textContent = "📋 Copiar link"; }, 2000);
+  } catch (_) {
+    prompt("Copie o link:", ultimoLink);
+  }
+};
+
+// ── Novo correio ──────────────────────────────────────────────────────────────
+$("novo").onclick = () => {
+  ["para", "msg", "de", "remetente"].forEach(id => $(id).value = "");
+  atualizarContador();
+  $("anon").checked = true;
+  $("de").disabled = true;
+  $("badge-tg").classList.remove("show");
+  $("resultado").style.display = "none";
+  $("resultado").classList.remove("slide-up");
+  $("form").style.display = "block";
+  $("para").focus();
+};
+
+// ── Confetti ──────────────────────────────────────────────────────────────────
+(function() {
+  const canvas = document.getElementById("confetti-canvas");
+  const ctx = canvas.getContext("2d");
+  let particles = [];
+  let animFrame = null;
+  let running = false;
+
+  const COLORS = ["#ff6fae","#ffc83d","#3ec46d","#43b3ff","#ff7a2d","#ff3d3d","#a259ff"];
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  window.addEventListener("resize", resize);
+  resize();
+
+  function Particle() {
+    this.x = Math.random() * canvas.width;
+    this.y = -10;
+    this.r = 5 + Math.random() * 7;
+    this.color = COLORS[Math.floor(Math.random() * COLORS.length)];
+    this.vx = (Math.random() - 0.5) * 4;
+    this.vy = 3 + Math.random() * 5;
+    this.angle = Math.random() * Math.PI * 2;
+    this.spin = (Math.random() - 0.5) * 0.2;
+    this.shape = Math.random() > 0.5 ? "rect" : "circle";
+    this.alpha = 1;
+  }
+
+  Particle.prototype.update = function() {
+    this.x += this.vx;
+    this.y += this.vy;
+    this.angle += this.spin;
+    this.vy += 0.08; // gravidade
+    if (this.y > canvas.height * 0.6) this.alpha -= 0.04;
   };
-</script></body></html>
+
+  Particle.prototype.draw = function() {
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, this.alpha);
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.angle);
+    ctx.fillStyle = this.color;
+    if (this.shape === "rect") {
+      ctx.fillRect(-this.r / 2, -this.r / 2, this.r, this.r * 0.5);
+    } else {
+      ctx.beginPath();
+      ctx.arc(0, 0, this.r / 2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+  };
+
+  function loop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles = particles.filter(p => p.alpha > 0);
+    particles.forEach(p => { p.update(); p.draw(); });
+    if (particles.length > 0) {
+      animFrame = requestAnimationFrame(loop);
+    } else {
+      running = false;
+      cancelAnimationFrame(animFrame);
+    }
+  }
+
+  window.dispararConfetti = function() {
+    resize();
+    for (let i = 0; i < 140; i++) {
+      setTimeout(() => particles.push(new Particle()), Math.random() * 600);
+    }
+    if (!running) {
+      running = true;
+      loop();
+    }
+  };
+})();
+</script>
+</body></html>

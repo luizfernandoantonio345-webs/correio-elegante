@@ -1,62 +1,519 @@
 <!doctype html><html lang="pt-br"><head>
 <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Moderação · Correio</title>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<title>Moderação · Correio Elegante</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 <style>
-  body{font-family:"Outfit",system-ui,sans-serif;background:#15173a;color:#f3e7cf;margin:0;padding:22px}
-  .wrap{max-width:720px;margin:0 auto}
-  h1{font-size:22px;margin:0 0 16px}
-  .barra{display:flex;gap:8px;margin-bottom:18px}
-  input{flex:1;font:inherit;padding:11px 13px;border-radius:10px;border:1.5px solid rgba(255,255,255,.18);background:#1f2150;color:#fff}
-  button{font:inherit;font-weight:700;border:0;border-radius:10px;padding:11px 16px;cursor:pointer;background:#ff7a2d;color:#fff}
-  .item{background:#1f2150;border:1px solid rgba(255,255,255,.1);border-radius:13px;padding:14px;margin-bottom:10px}
-  .item.oc{border-color:#ff3d3d;opacity:.7}
-  .top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}
-  .cod{font-weight:800;color:#ffc83d}
-  .msg{font-size:15px;line-height:1.4}.meta{font-size:12px;opacity:.6;margin-top:6px}
-  .quem{font-size:12px;margin-top:8px;padding:8px 10px;border-radius:8px;background:rgba(255,200,61,.12);color:#ffd98a}
-  .flag{font-size:11px;font-weight:700;background:#ff3d3d;color:#fff;padding:2px 8px;border-radius:999px;margin-left:6px}
-  .acao{background:#3a3c70;font-size:13px;padding:8px 12px}
-  .acao.mostrar{background:#3ec46d}.acao.ocultar{background:#ff3d3d}
-  .vazio{opacity:.6;text-align:center;padding:30px}
-</style></head><body>
-<div class="wrap">
-  <h1>🛡️ Moderação dos Correios</h1>
-  <div class="barra">
-    <input id="key" type="password" placeholder="Chave de moderação (ADMIN_KEY)" />
-    <button id="entrar">Entrar</button>
+  :root{
+    --bg:#0e1022;--surface:#171930;--surface-2:#1f2245;--border:rgba(255,255,255,.09);
+    --kraft:#f3e7cf;--milho:#ffc83d;--brasa:#ff7a2d;--verde:#3ec46d;
+    --muted:rgba(255,255,255,.45);--danger:#ff4444;--warn:#f5c518;
+    --radius:14px;--radius-sm:9px
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:"Outfit",system-ui,sans-serif;background:var(--bg);color:var(--kraft);min-height:100vh;padding:0 0 60px}
+
+  /* ─── Header ─── */
+  .header{background:linear-gradient(135deg,#1a1040,#2a1155);border-bottom:1px solid var(--border);
+    padding:20px 24px;display:flex;align-items:center;gap:12px}
+  .header-icon{font-size:28px}
+  .header h1{font-size:20px;font-weight:800;letter-spacing:-.3px}
+  .header p{font-size:13px;color:var(--muted);margin-top:2px}
+
+  /* ─── Layout ─── */
+  .wrap{max-width:860px;margin:0 auto;padding:24px 20px}
+
+  /* ─── Login ─── */
+  .login-card{
+    background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+    padding:32px;max-width:420px;margin:60px auto;text-align:center
+  }
+  .login-card h2{font-size:18px;margin-bottom:6px}
+  .login-card p{color:var(--muted);font-size:14px;margin-bottom:22px}
+  .login-row{display:flex;gap:10px}
+  .login-row input{
+    flex:1;font:inherit;padding:12px 14px;border-radius:var(--radius-sm);
+    border:1.5px solid var(--border);background:var(--surface-2);color:var(--kraft);font-size:14px
+  }
+  .login-row input:focus{outline:none;border-color:var(--milho)}
+  .btn{
+    font:inherit;font-weight:700;font-size:14px;border:none;border-radius:var(--radius-sm);
+    padding:12px 18px;cursor:pointer;background:var(--brasa);color:#fff;
+    transition:filter .15s,transform .12s;white-space:nowrap
+  }
+  .btn:hover{filter:brightness(1.1)}
+  .btn:active{transform:scale(.97)}
+  .btn.verde{background:var(--verde)}
+  .btn.muted{background:var(--surface-2);color:var(--kraft);border:1px solid var(--border)}
+  .btn.danger{background:var(--danger)}
+  .btn.sm{padding:8px 13px;font-size:13px}
+
+  /* ─── Stats cards ─── */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+  @media(max-width:640px){.stats{grid-template-columns:repeat(2,1fr)}}
+  .stat-card{
+    background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+    padding:18px 16px;text-align:center
+  }
+  .stat-card .stat-num{font-size:32px;font-weight:800;line-height:1;margin-bottom:4px}
+  .stat-card .stat-label{font-size:12px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase}
+  .stat-card.s-total .stat-num{color:var(--milho)}
+  .stat-card.s-ocultos .stat-num{color:var(--danger)}
+  .stat-card.s-flags .stat-num{color:var(--warn)}
+  .stat-card.s-entrega .stat-num{color:var(--verde)}
+
+  /* ─── Toolbar ─── */
+  .toolbar{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px;align-items:center}
+  .toolbar input[type=text]{
+    flex:1;min-width:200px;font:inherit;font-size:14px;
+    padding:10px 14px;border-radius:var(--radius-sm);
+    border:1.5px solid var(--border);background:var(--surface-2);color:var(--kraft)
+  }
+  .toolbar input[type=text]:focus{outline:none;border-color:var(--milho)}
+  .toolbar select{
+    font:inherit;font-size:14px;padding:10px 12px;border-radius:var(--radius-sm);
+    border:1.5px solid var(--border);background:var(--surface-2);color:var(--kraft);cursor:pointer
+  }
+  .toolbar select:focus{outline:none;border-color:var(--milho)}
+  .refresh-label{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--muted);cursor:pointer;white-space:nowrap}
+  .refresh-label input[type=checkbox]{accent-color:var(--milho);width:16px;height:16px;cursor:pointer}
+
+  /* ─── Cards ─── */
+  #lista{display:flex;flex-direction:column;gap:12px}
+  .item{
+    background:var(--surface);border:1.5px solid var(--border);
+    border-radius:var(--radius);padding:18px 18px 14px;
+    transition:border-color .2s,opacity .2s;position:relative
+  }
+  .item.sev-warn{border-color:rgba(245,197,24,.45)}
+  .item.sev-danger{border-color:rgba(255,68,68,.5)}
+  .item.sev-oculto{opacity:.45;border-color:rgba(255,255,255,.05)}
+
+  .item-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px}
+  .item-top-left{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+  .item-top-right{display:flex;gap:7px;align-items:center;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end}
+
+  .cod{font-family:monospace;font-weight:800;font-size:14px;letter-spacing:.5px;
+    color:var(--milho);background:rgba(255,200,61,.1);padding:3px 9px;border-radius:6px}
+  .badge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;letter-spacing:.3px}
+  .badge-flag{background:rgba(255,68,68,.2);color:#ff8888;border:1px solid rgba(255,68,68,.4)}
+  .badge-oculto{background:rgba(255,255,255,.06);color:var(--muted);border:1px solid var(--border)}
+  .badge-ok{background:rgba(62,196,109,.12);color:#7ee8a2;border:1px solid rgba(62,196,109,.3)}
+
+  .item-para{font-size:15px;font-weight:600;color:#fff;margin-bottom:5px}
+  .item-msg{
+    font-size:14px;line-height:1.55;color:rgba(243,231,207,.85);
+    padding:10px 13px;background:rgba(0,0,0,.2);border-radius:8px;margin-bottom:10px;
+    font-style:italic
+  }
+  .item-meta{font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 14px;margin-bottom:8px}
+  .item-meta span{display:flex;align-items:center;gap:4px}
+
+  .item-quem{
+    font-size:12px;padding:9px 12px;border-radius:8px;
+    background:rgba(255,200,61,.08);border:1px solid rgba(255,200,61,.15);
+    color:#ffd98a;display:flex;flex-wrap:wrap;gap:6px 16px
+  }
+  .item-quem b{color:#ffe588}
+
+  .item-terms{
+    margin-top:8px;font-size:12px;padding:7px 12px;border-radius:8px;
+    background:rgba(255,68,68,.08);border:1px solid rgba(255,68,68,.2);color:#ff9999
+  }
+  .item-terms b{color:#ffbbbb}
+
+  /* IP bulk button */
+  .btn-ip{font-size:11px;padding:5px 10px;border-radius:6px;font-family:monospace;
+    background:rgba(255,122,45,.15);color:#ffa06a;border:1px solid rgba(255,122,45,.3);
+    cursor:pointer;font-weight:600}
+  .btn-ip:hover{background:rgba(255,122,45,.28)}
+
+  /* ─── Empty / error states ─── */
+  .vazio{text-align:center;padding:50px 20px;color:var(--muted);font-size:15px}
+  .vazio .vazio-icon{font-size:40px;margin-bottom:12px}
+
+  /* ─── Toast ─── */
+  #toast-container{position:fixed;bottom:24px;right:24px;z-index:1000;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+  .toast{
+    background:#1f2245;border:1px solid var(--border);border-radius:var(--radius-sm);
+    padding:12px 18px;font-size:14px;font-weight:600;color:var(--kraft);
+    box-shadow:0 8px 32px rgba(0,0,0,.4);
+    transform:translateX(120%);transition:transform .3s cubic-bezier(.2,.8,.2,1);
+    pointer-events:none;max-width:280px
+  }
+  .toast.show{transform:translateX(0)}
+  .toast.toast-ok{border-color:rgba(62,196,109,.4);color:#7ee8a2}
+  .toast.toast-danger{border-color:rgba(255,68,68,.4);color:#ff9999}
+
+  /* ─── Confirm dialog ─── */
+  .dialog-overlay{
+    position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);
+    z-index:500;display:none;place-items:center
+  }
+  .dialog-overlay.open{display:grid}
+  .dialog-box{
+    background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+    padding:28px;max-width:360px;width:90%;text-align:center
+  }
+  .dialog-box h3{font-size:17px;margin-bottom:8px}
+  .dialog-box p{font-size:14px;color:var(--muted);margin-bottom:22px;line-height:1.5}
+  .dialog-btns{display:flex;gap:10px;justify-content:center}
+
+  /* ─── Export button area ─── */
+  .toolbar-right{display:flex;gap:8px;align-items:center}
+
+  /* ─── Scrollbar ─── */
+  ::-webkit-scrollbar{width:6px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:var(--surface-2);border-radius:3px}
+</style>
+</head><body>
+
+<div class="header">
+  <div class="header-icon">🛡️</div>
+  <div>
+    <h1>Moderação dos Correios</h1>
+    <p>Arraiá TI · Painel administrativo</p>
   </div>
-  <div id="lista"></div>
 </div>
+
+<div class="wrap">
+  <!-- Login -->
+  <div class="login-card" id="login-card">
+    <h2>Acesso restrito</h2>
+    <p>Digite a chave de moderação para continuar</p>
+    <div class="login-row">
+      <input id="key" type="password" placeholder="Chave de moderação (ADMIN_KEY)" autocomplete="current-password" />
+      <button class="btn" id="entrar">Entrar</button>
+    </div>
+    <div id="login-erro" style="color:#ff8888;font-size:13px;margin-top:12px;display:none">Chave inválida. Tente novamente.</div>
+  </div>
+
+  <!-- Dashboard (hidden until login) -->
+  <div id="dashboard" style="display:none">
+
+    <!-- Stats -->
+    <div class="stats" id="stats">
+      <div class="stat-card s-total"><div class="stat-num" id="s-total">—</div><div class="stat-label">Total de correios</div></div>
+      <div class="stat-card s-ocultos"><div class="stat-num" id="s-ocultos">—</div><div class="stat-label">Ocultos</div></div>
+      <div class="stat-card s-flags"><div class="stat-num" id="s-flags">—</div><div class="stat-label">Sinalizados</div></div>
+      <div class="stat-card s-entrega"><div class="stat-num" id="s-entrega">—%</div><div class="stat-label">Taxa de entrega</div></div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <input type="text" id="busca" placeholder="🔍  Buscar por destinatário, remetente ou mensagem…" />
+      <select id="ordenar">
+        <option value="recente">Mais recentes</option>
+        <option value="flags">Sinalizados primeiro</option>
+        <option value="ocultos">Ocultos primeiro</option>
+      </select>
+      <div class="toolbar-right">
+        <button class="btn sm verde" id="btn-refresh">↻ Atualizar</button>
+        <button class="btn sm muted" id="btn-export">⬇ CSV</button>
+        <label class="refresh-label">
+          <input type="checkbox" id="auto-refresh" /> Atualizar (30s)
+        </label>
+      </div>
+    </div>
+
+    <!-- List -->
+    <div id="lista"></div>
+  </div>
+</div>
+
+<!-- Confirm dialog -->
+<div class="dialog-overlay" id="dialog-overlay">
+  <div class="dialog-box">
+    <h3 id="dialog-title">Confirmar ação</h3>
+    <p id="dialog-msg">Tem certeza que quer ocultar esta mensagem?</p>
+    <div class="dialog-btns">
+      <button class="btn muted" id="dialog-cancel">Cancelar</button>
+      <button class="btn danger" id="dialog-ok">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div id="toast-container"></div>
+
 <script>
-  const $=id=>document.getElementById(id);
-  let KEY="";
-  $("entrar").onclick=()=>{ KEY=$("key").value.trim(); carregar(); };
-  async function carregar(){
-    if(!KEY) return;
-    try{
-      const r=await fetch("/api/admin/correios?key="+encodeURIComponent(KEY));
-      if(!r.ok){ $("lista").innerHTML='<div class="vazio">Chave inválida.</div>'; return; }
-      const cs=await r.json();
-      if(!cs.length){ $("lista").innerHTML='<div class="vazio">Nenhum correio ainda.</div>'; return; }
-      $("lista").innerHTML="";
-      cs.forEach(c=>{
-        const d=document.createElement("div"); d.className="item"+(c.oculto?" oc":"");
-        const flag = c.termos ? `<span class="flag">⚠️ ${esc(c.termos)}</span>` : "";
-        d.innerHTML=`<div class="top"><span class="cod">${c.codigo} ${flag}</span>
-          <button class="acao ${c.oculto?'mostrar':'ocultar'}">${c.oculto?'Mostrar':'Ocultar'}</button></div>
-          <div class="msg"><b>Para ${esc(c.para)}:</b> “${esc(c.mensagem)}”</div>
-          <div class="meta">Aparece como “${esc(c.de)}” · via ${c.via} · ${c.entregue?'entregue':'pendente'}</div>
-          <div class="quem">👤 Enviado por: <b>${esc(c.remetente_real||"—")}</b>
-            · IP ${esc(c.ip||"—")} · ${esc(c.quando||"")}</div>`;
-        d.querySelector("button").onclick=()=>toggle(c.codigo,!c.oculto);
-        $("lista").appendChild(d);
-      });
-    }catch(e){}
+(function(){
+  const $ = id => document.getElementById(id);
+
+  let KEY = "";
+  let todosCorreios = [];
+  let autoTimer = null;
+
+  /* ─── Toast ─── */
+  function toast(msg, tipo = "ok") {
+    const el = document.createElement("div");
+    el.className = "toast toast-" + tipo;
+    el.textContent = msg;
+    $("toast-container").appendChild(el);
+    requestAnimationFrame(() => { requestAnimationFrame(() => { el.classList.add("show"); }); });
+    setTimeout(() => {
+      el.classList.remove("show");
+      setTimeout(() => el.remove(), 350);
+    }, 3000);
   }
-  async function toggle(codigo,ocultar){
-    await fetch(`/api/admin/ocultar/${codigo}?key=${encodeURIComponent(KEY)}&ocultar=${ocultar}`,{method:"POST"});
-    carregar();
+
+  /* ─── Confirm dialog ─── */
+  function confirmar(titulo, msg) {
+    return new Promise(resolve => {
+      $("dialog-title").textContent = titulo;
+      $("dialog-msg").textContent = msg;
+      $("dialog-overlay").classList.add("open");
+      function cleanup(val) {
+        $("dialog-overlay").classList.remove("open");
+        $("dialog-ok").onclick = null;
+        $("dialog-cancel").onclick = null;
+        resolve(val);
+      }
+      $("dialog-ok").onclick = () => cleanup(true);
+      $("dialog-cancel").onclick = () => cleanup(false);
+    });
   }
-  function esc(s){return (s||"").replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));}
-</script></body></html>
+
+  /* ─── Login ─── */
+  async function entrar() {
+    KEY = $("key").value.trim();
+    if (!KEY) return;
+    $("login-erro").style.display = "none";
+    await carregar(true);
+  }
+  $("entrar").onclick = entrar;
+  $("key").addEventListener("keydown", e => { if (e.key === "Enter") entrar(); });
+
+  /* ─── Carregar dados ─── */
+  async function carregar(primeiraVez = false) {
+    if (!KEY) return;
+    try {
+      const r = await fetch("/api/admin/correios?key=" + encodeURIComponent(KEY));
+      if (!r.ok) {
+        if (primeiraVez) {
+          $("login-erro").style.display = "block";
+          KEY = "";
+        }
+        return;
+      }
+      const cs = await r.json();
+      todosCorreios = cs;
+      if (primeiraVez) {
+        $("login-card").style.display = "none";
+        $("dashboard").style.display = "block";
+      }
+      atualizarStats(cs);
+      renderizar();
+      if (!primeiraVez) toast("Lista atualizada ✓", "ok");
+    } catch(e) {
+      if (primeiraVez) { $("login-erro").textContent = "Erro de rede. Tente novamente."; $("login-erro").style.display = "block"; }
+    }
+  }
+
+  /* ─── Stats ─── */
+  function atualizarStats(cs) {
+    const total = cs.length;
+    const ocultos = cs.filter(c => c.oculto).length;
+    const flags = cs.filter(c => c.termos).length;
+    const entregues = cs.filter(c => c.entregue).length;
+    const taxa = total > 0 ? Math.round(entregues / total * 100) : 0;
+    $("s-total").textContent = total;
+    $("s-ocultos").textContent = ocultos;
+    $("s-flags").textContent = flags;
+    $("s-entrega").textContent = taxa + "%";
+  }
+
+  /* ─── Escape HTML ─── */
+  function esc(s) {
+    return (s || "").replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+  }
+
+  /* ─── Contagem de termos ─── */
+  function contarTermos(termos) {
+    if (!termos) return 0;
+    return termos.split(",").map(s => s.trim()).filter(Boolean).length;
+  }
+
+  /* ─── Renderizar lista ─── */
+  function renderizar() {
+    const busca = $("busca").value.toLowerCase();
+    const ordem = $("ordenar").value;
+
+    /* Contar IPs para detectar duplicados */
+    const contadorIP = {};
+    todosCorreios.forEach(c => {
+      if (c.ip) contadorIP[c.ip] = (contadorIP[c.ip] || 0) + 1;
+    });
+
+    /* Filtrar */
+    let lista = todosCorreios.filter(c => {
+      if (!busca) return true;
+      return (c.para || "").toLowerCase().includes(busca) ||
+             (c.mensagem || "").toLowerCase().includes(busca) ||
+             (c.remetente_real || "").toLowerCase().includes(busca) ||
+             (c.de || "").toLowerCase().includes(busca);
+    });
+
+    /* Ordenar */
+    if (ordem === "flags") {
+      lista = lista.slice().sort((a, b) => contarTermos(b.termos) - contarTermos(a.termos));
+    } else if (ordem === "ocultos") {
+      lista = lista.slice().sort((a, b) => (b.oculto ? 1 : 0) - (a.oculto ? 1 : 0));
+    }
+
+    const container = $("lista");
+    if (!lista.length) {
+      container.innerHTML = `<div class="vazio"><div class="vazio-icon">📭</div>${busca ? "Nenhum resultado para "" + esc(busca) + ""." : "Nenhum correio ainda."}</div>`;
+      return;
+    }
+
+    container.innerHTML = "";
+    lista.forEach(c => {
+      const nt = contarTermos(c.termos);
+      let sev = "";
+      if (c.oculto) sev = "sev-oculto";
+      else if (nt >= 3) sev = "sev-danger";
+      else if (nt >= 1) sev = "sev-warn";
+
+      /* Badges */
+      let badges = "";
+      if (c.termos) badges += `<span class="badge badge-flag">⚠️ ${nt} termo${nt > 1 ? "s" : ""}</span>`;
+      if (c.oculto) badges += `<span class="badge badge-oculto">🚫 Oculto</span>`;
+      if (!c.termos && !c.oculto) badges += `<span class="badge badge-ok">✓ OK</span>`;
+
+      /* IP duplicado */
+      const ipCount = c.ip ? (contadorIP[c.ip] || 0) : 0;
+      const btnIP = ipCount > 1
+        ? `<button class="btn-ip" data-ip="${esc(c.ip)}" title="Ocultar todos os ${ipCount} correios deste IP">🌐 IP ×${ipCount}</button>`
+        : "";
+
+      /* Botão principal */
+      const btnLabel = c.oculto ? "Mostrar" : "Ocultar";
+      const btnCls = c.oculto ? "btn sm verde" : "btn sm danger";
+
+      const el = document.createElement("div");
+      el.className = "item " + sev;
+      el.dataset.codigo = c.codigo;
+      el.innerHTML = `
+        <div class="item-top">
+          <div class="item-top-left">
+            <span class="cod">${esc(c.codigo)}</span>
+            ${badges}
+          </div>
+          <div class="item-top-right">
+            ${btnIP}
+            <button class="${btnCls} btn-toggle">${btnLabel}</button>
+          </div>
+        </div>
+        <div class="item-para">Para <b>${esc(c.para)}</b></div>
+        <div class="item-msg">"${esc(c.mensagem)}"</div>
+        <div class="item-meta">
+          <span>👤 Aparece como: <b>${esc(c.de)}</b></span>
+          <span>📡 via ${esc(c.via || "—")}</span>
+          <span>${c.entregue ? "✅ entregue" : "⏳ pendente"}</span>
+          ${c.quando ? `<span>🕐 ${esc(c.quando)}</span>` : ""}
+        </div>
+        <div class="item-quem">
+          👤 <b>${esc(c.remetente_real || "—")}</b>
+          &nbsp;·&nbsp; 🌐 IP: <b>${esc(c.ip || "—")}</b>
+        </div>
+        ${c.termos ? `<div class="item-terms">⚠️ Termos detectados: <b>${esc(c.termos)}</b></div>` : ""}
+      `;
+
+      /* Toggle ocultar/mostrar */
+      el.querySelector(".btn-toggle").onclick = () => toggle(c.codigo, !c.oculto, !!c.termos, c.oculto);
+
+      /* Ocultar por IP */
+      const btnIPel = el.querySelector(".btn-ip");
+      if (btnIPel) {
+        btnIPel.onclick = () => ocultarPorIP(c.ip);
+      }
+
+      container.appendChild(el);
+    });
+  }
+
+  /* ─── Toggle ocultar/mostrar ─── */
+  async function toggle(codigo, ocultar, temTermos, eraOculto) {
+    if (ocultar && !temTermos) {
+      const ok = await confirmar(
+        "Ocultar mensagem",
+        "Essa mensagem não foi sinalizada pelo filtro. Tem certeza que quer ocultá-la?"
+      );
+      if (!ok) return;
+    }
+    try {
+      const r = await fetch(`/api/admin/ocultar/${codigo}?key=${encodeURIComponent(KEY)}&ocultar=${ocultar}`, {method:"POST"});
+      if (!r.ok) { toast("Erro ao salvar ✗", "danger"); return; }
+      /* Atualiza localmente para resposta rápida */
+      const idx = todosCorreios.findIndex(c => c.codigo === codigo);
+      if (idx !== -1) todosCorreios[idx].oculto = ocultar;
+      atualizarStats(todosCorreios);
+      renderizar();
+      toast(ocultar ? "Correio ocultado ✓" : "Correio restaurado ✓", ocultar ? "danger" : "ok");
+    } catch(e) {
+      toast("Erro de rede ✗", "danger");
+    }
+  }
+
+  /* ─── Ocultar por IP ─── */
+  async function ocultarPorIP(ip) {
+    const afetados = todosCorreios.filter(c => c.ip === ip && !c.oculto);
+    if (!afetados.length) { toast("Nenhum visível deste IP", "ok"); return; }
+    const ok = await confirmar(
+      "Ocultar por IP",
+      `Isso vai ocultar ${afetados.length} correio${afetados.length > 1 ? "s" : ""} do IP ${ip}. Confirmar?`
+    );
+    if (!ok) return;
+    for (const c of afetados) {
+      await fetch(`/api/admin/ocultar/${c.codigo}?key=${encodeURIComponent(KEY)}&ocultar=true`, {method:"POST"});
+      const idx = todosCorreios.findIndex(x => x.codigo === c.codigo);
+      if (idx !== -1) todosCorreios[idx].oculto = true;
+    }
+    atualizarStats(todosCorreios);
+    renderizar();
+    toast(`${afetados.length} correio${afetados.length > 1 ? "s" : ""} ocultado${afetados.length > 1 ? "s" : ""} ✓`, "danger");
+  }
+
+  /* ─── Busca / ordenação em tempo real ─── */
+  $("busca").addEventListener("input", renderizar);
+  $("ordenar").addEventListener("change", renderizar);
+
+  /* ─── Atualizar manual ─── */
+  $("btn-refresh").onclick = () => carregar();
+
+  /* ─── Auto-refresh ─── */
+  $("auto-refresh").addEventListener("change", function() {
+    if (this.checked) {
+      autoTimer = setInterval(() => carregar(), 30000);
+    } else {
+      clearInterval(autoTimer);
+      autoTimer = null;
+    }
+  });
+
+  /* ─── Export CSV ─── */
+  $("btn-export").onclick = () => {
+    if (!todosCorreios.length) { toast("Nenhum dado para exportar", "danger"); return; }
+    const cols = ["codigo","para","mensagem","de","remetente_real","ip","via","entregue","oculto","termos","quando"];
+    const header = cols.join(",");
+    const rows = todosCorreios.map(c =>
+      cols.map(k => {
+        const v = String(c[k] === undefined || c[k] === null ? "" : c[k]);
+        return '"' + v.replace(/"/g, '""') + '"';
+      }).join(",")
+    );
+    const csv = [header, ...rows].join("\r\n");
+    const blob = new Blob(["﻿" + csv], {type:"text/csv;charset=utf-8;"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "correios_" + new Date().toISOString().slice(0,10) + ".csv";
+    a.click();
+    URL.revokeObjectURL(url);
+    toast("CSV exportado ✓", "ok");
+  };
+})();
+</script>
+</body></html>

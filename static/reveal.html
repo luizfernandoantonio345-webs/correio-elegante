@@ -6,31 +6,57 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Caveat:wght@600;700&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet" />
 <style>
-  :root{--noite:#170d2b;--vinho:#37102e;--papel:#f7eedb;--papel-2:#efe2c6;--tinta:#3a2c1f;
-    --tinta-2:#8a7355;--ouro:#e9b949;--selo:#c2402f;--rosa:#ff9ec7}
+  :root{
+    --noite:#170d2b;--vinho:#37102e;--papel:#f7eedb;--papel-2:#efe2c6;
+    --tinta:#3a2c1f;--tinta-2:#8a7355;--ouro:#e9b949;--selo:#c2402f;--rosa:#ff9ec7
+  }
   *{box-sizing:border-box}html,body{margin:0;height:100%}
-  body{font-family:"Outfit",system-ui,sans-serif;color:var(--papel);min-height:100dvh;
+
+  /* Animated background gradient */
+  @keyframes gradshift{
+    0%  {background-position:0% 50%}
+    50% {background-position:100% 50%}
+    100%{background-position:0% 50%}
+  }
+  body{
+    font-family:"Outfit",system-ui,sans-serif;color:var(--papel);min-height:100dvh;
     display:grid;place-items:center;padding:24px;overflow:hidden;position:relative;
-    background:radial-gradient(1000px 700px at 50% 130%,#5a2466 0,transparent 60%),
-      radial-gradient(700px 500px at 85% -10%,#2c1b4d 0,transparent 55%),
-      linear-gradient(160deg,var(--noite),var(--vinho))}
+    background:linear-gradient(-45deg,#170d2b,#37102e,#1e0a3c,#2c1045,#3d0f2b,#170d2b);
+    background-size:400% 400%;
+    animation:gradshift 12s ease infinite
+  }
+
   /* vinheta */
   body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:3;
     box-shadow:inset 0 0 220px 40px rgba(0,0,0,.45)}
+
+  /* Floating sparkles */
   .vaga{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
   .vaga i{position:absolute;width:5px;height:5px;border-radius:50%;
     background:radial-gradient(circle,#fff6c8,#ffcf6b);box-shadow:0 0 12px #ffcf6b;
     animation:flutua linear infinite;opacity:0}
-  @keyframes flutua{0%{transform:translateY(20px);opacity:0}20%{opacity:.9}80%{opacity:.6}
-    100%{transform:translateY(-65vh) translateX(24px);opacity:0}}
+  @keyframes flutua{
+    0%{transform:translateY(20px);opacity:0}
+    20%{opacity:.9}80%{opacity:.6}
+    100%{transform:translateY(-65vh) translateX(24px);opacity:0}
+  }
+
+  /* Canvas confetti */
+  #confetti-canvas{position:fixed;inset:0;pointer-events:none;z-index:20;display:none}
+
   .palco{position:relative;z-index:2;width:100%;max-width:430px;text-align:center}
   .chamada{margin-bottom:22px;animation:sobe .7s ease both}
   .chamada .selo-cima{font-size:12px;letter-spacing:4px;text-transform:uppercase;color:var(--ouro);opacity:.85}
   .chamada h1{font-family:"Playfair Display",serif;font-weight:700;font-size:26px;margin:10px 0 6px;color:#fff}
   .chamada p{margin:0;color:var(--rosa);font-size:15px}
+
   .cena{perspective:1500px}
-  .envelope{position:relative;width:100%;aspect-ratio:1.5/1;cursor:pointer;
-    filter:drop-shadow(0 28px 46px rgba(0,0,0,.5));transition:transform .5s ease;animation:flutuar 5s ease-in-out infinite}
+  .envelope{
+    position:relative;width:100%;aspect-ratio:1.5/1;cursor:pointer;
+    filter:drop-shadow(0 28px 46px rgba(0,0,0,.5));
+    transition:transform .5s ease;
+    animation:flutuar 5s ease-in-out infinite
+  }
   @keyframes flutuar{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
   .envelope:active{transform:scale(.99)}
   .corpo{position:absolute;inset:0;border-radius:15px;background:linear-gradient(160deg,#82304e,#5d1c38);overflow:hidden}
@@ -41,10 +67,13 @@
     clip-path:polygon(0 32%,50% 100%,100% 32%,100% 100%,0 100%)}
   .aba-lado{position:absolute;inset:0;z-index:2;border-radius:15px;background:linear-gradient(160deg,#82304e,#5d1c38);
     clip-path:polygon(0 0,50% 56%,100% 0,100% 100%,0 100%);opacity:.55}
-  .carta{position:absolute;left:6%;right:6%;bottom:8%;z-index:4;color:var(--tinta);
+
+  .carta{
+    position:absolute;left:6%;right:6%;bottom:8%;z-index:4;color:var(--tinta);
     border-radius:11px;padding:24px 22px;text-align:left;box-shadow:0 12px 26px rgba(0,0,0,.32);
     background:linear-gradient(150deg,var(--papel),var(--papel-2));
-    transform:translateY(8%);opacity:0;transition:.8s cubic-bezier(.2,.8,.2,1) .15s;max-height:62%;overflow:hidden}
+    transform:translateY(8%);opacity:0;transition:.8s cubic-bezier(.2,.8,.2,1) .15s;max-height:62%;overflow:hidden
+  }
   .carta::before{content:"";position:absolute;inset:0;border-radius:11px;pointer-events:none;
     background:radial-gradient(120% 60% at 80% 0%,rgba(255,255,255,.5),transparent 60%),
       repeating-linear-gradient(0deg,transparent 0 27px,rgba(138,115,85,.10) 27px 28px);opacity:.5}
@@ -52,35 +81,92 @@
     text-transform:uppercase;color:var(--selo);opacity:.75;margin-bottom:10px}
   .carta .para{font-size:13px;color:var(--tinta-2);margin-bottom:6px}
   .carta .msg{font-family:"Playfair Display",serif;font-size:19px;line-height:1.5;font-style:italic;color:#322517}
-  .carta .de{font-family:"Caveat",cursive;font-size:26px;margin-top:16px;color:var(--selo);text-align:right}
-  .aba-cima{position:absolute;left:0;right:0;top:0;height:60%;z-index:6;transform-origin:top;
+  .carta .de{
+    font-family:"Caveat",cursive;font-size:26px;margin-top:16px;color:var(--selo);text-align:right;
+    display:flex;align-items:center;justify-content:flex-end;gap:8px
+  }
+  .de-heart{display:inline-block;opacity:0;transition:opacity .4s .6s}
+  @keyframes heartbeat{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+
+  .aba-cima{
+    position:absolute;left:0;right:0;top:0;height:60%;z-index:6;transform-origin:top;
     background:linear-gradient(160deg,#8f3656,#6a223f);border-radius:15px 15px 0 0;
-    clip-path:polygon(0 0,50% 100%,100% 0);transition:transform .6s ease,z-index 0s .3s}
-  .selo{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);z-index:7;width:58px;height:58px;
-    border-radius:50%;background:radial-gradient(circle at 36% 32%,#e9684f,var(--selo));display:grid;place-items:center;
+    clip-path:polygon(0 0,50% 100%,100% 0);transition:transform .6s ease,z-index 0s .3s
+  }
+  .selo{
+    position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);z-index:7;width:58px;height:58px;
+    border-radius:50%;background:radial-gradient(circle at 36% 32%,#e9684f,var(--selo));
+    display:grid;place-items:center;
     box-shadow:0 5px 12px rgba(0,0,0,.4),inset 0 -3px 6px rgba(0,0,0,.25);
-    font-family:"Playfair Display",serif;font-weight:700;color:#fff3e0;font-size:19px;transition:.45s;overflow:hidden}
-  .selo::after{content:"";position:absolute;inset:0;background:linear-gradient(120deg,transparent 35%,rgba(255,255,255,.5) 50%,transparent 65%);
+    font-family:"Playfair Display",serif;font-weight:700;color:#fff3e0;font-size:19px;
+    transition:.45s;overflow:hidden
+  }
+  .selo::after{content:"";position:absolute;inset:0;
+    background:linear-gradient(120deg,transparent 35%,rgba(255,255,255,.5) 50%,transparent 65%);
     transform:translateX(-120%);animation:brilho 3.2s ease-in-out infinite}
   @keyframes brilho{0%,60%{transform:translateX(-120%)}80%,100%{transform:translateX(120%)}}
+
   .toque{margin-top:18px;color:var(--papel);opacity:.78;font-size:14px;letter-spacing:.5px;animation:pisca 1.8s ease-in-out infinite}
   @keyframes pisca{50%{opacity:.4}}
-  .hint{margin-top:14px;font-size:13px;color:var(--ouro);opacity:0;transition:opacity .6s .5s}
+
+  /* Share buttons area */
+  .acoes{margin-top:18px;display:flex;flex-direction:column;align-items:center;gap:10px;opacity:0;pointer-events:none;transition:opacity .6s .5s}
+  .acoes-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+  .btn-share{
+    display:inline-flex;align-items:center;gap:7px;
+    font-family:"Outfit",sans-serif;font-size:14px;font-weight:600;
+    border:none;border-radius:30px;padding:11px 20px;cursor:pointer;
+    text-decoration:none;transition:transform .15s,filter .15s;letter-spacing:.3px
+  }
+  .btn-share:hover{transform:translateY(-2px);filter:brightness(1.1)}
+  .btn-share:active{transform:scale(.97)}
+  .btn-whatsapp{background:#25D366;color:#fff}
+  .btn-copy{background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3);backdrop-filter:blur(6px)}
+  .acoes-hint{font-size:12px;color:var(--ouro);opacity:.8;letter-spacing:.5px}
+
+  /* Open state */
   .aberto .aba-cima{transform:rotateX(180deg);z-index:1}
   .aberto .selo{transform:translate(-50%,-50%) scale(.35);opacity:0}
   .aberto .carta{transform:translateY(-48%);opacity:1;max-height:none}
   .aberto .envelope{aspect-ratio:1.16/1;animation:none}
   .aberto .toque{opacity:0;pointer-events:none}
-  .aberto .hint{opacity:1}
-  .rodape{margin-top:24px;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--ouro);opacity:.6}
-  .erro{color:var(--rosa);font-size:16px;background:rgba(0,0,0,.3);padding:20px;border-radius:14px}
+  .aberto .acoes{opacity:1;pointer-events:auto}
+  .aberto .de-heart{opacity:1;animation:heartbeat .9s ease-in-out infinite}
+
+  .rodape{margin-top:20px;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--ouro);opacity:.6}
+  .rodape a{color:var(--ouro);opacity:.7;text-decoration:none;display:block;margin-top:8px;font-size:11px;letter-spacing:1.5px}
+  .rodape a:hover{opacity:1;text-decoration:underline}
+
+  /* Error state */
+  .erro-box{
+    background:rgba(0,0,0,.35);border:1.5px solid rgba(255,158,199,.2);
+    border-radius:18px;padding:32px 28px;text-align:center;backdrop-filter:blur(10px)
+  }
+  .erro-box .erro-icon{font-size:48px;margin-bottom:12px}
+  .erro-box h2{font-family:"Playfair Display",serif;font-size:22px;margin:0 0 10px;color:#fff}
+  .erro-box p{color:var(--rosa);font-size:15px;margin:0 0 18px;line-height:1.5}
+  .erro-box .erro-dica{
+    display:inline-block;background:rgba(233,185,73,.15);border:1px solid rgba(233,185,73,.3);
+    border-radius:10px;padding:10px 16px;font-size:13px;color:var(--ouro);line-height:1.5
+  }
+
+  /* Petals */
   .petala{position:fixed;bottom:-40px;z-index:1;pointer-events:none;animation:cai 4s ease-in forwards}
   @keyframes cai{to{transform:translateY(-115vh) rotate(40deg);opacity:0}}
   @keyframes sobe{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
-  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}
-    .carta{opacity:1;transform:none}.aba-cima{transform:rotateX(180deg)}}
-</style></head><body>
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important}
+    .carta{opacity:1;transform:none}
+    .aba-cima{transform:rotateX(180deg)}
+    body{animation:none!important}
+  }
+</style>
+</head><body>
+
+<canvas id="confetti-canvas"></canvas>
 <div class="vaga" aria-hidden="true"></div>
+
 <div class="palco">
   <div class="chamada">
     <div class="selo-cima">Arraiá TI · Correio Elegante</div>
@@ -89,52 +175,222 @@
   </div>
   <div class="cena" id="cena">
     <div class="envelope" id="envelope" role="button" tabindex="0" aria-label="Abrir correio">
-      <div class="corpo"></div><div class="aba-lado"></div><div class="aba-baixo"></div>
+      <div class="corpo"></div>
+      <div class="aba-lado"></div>
+      <div class="aba-baixo"></div>
       <div class="carta">
         <div class="selo-titulo">Correio Elegante</div>
         <div class="para" id="c-para">Para você</div>
         <div class="msg" id="c-msg">…</div>
-        <div class="de" id="c-de">— Anônimo</div>
+        <div class="de" id="c-de">
+          <span id="de-texto">— Anônimo</span>
+          <span class="de-heart" id="de-heart" aria-hidden="true">❤️</span>
+        </div>
       </div>
-      <div class="aba-cima"></div><div class="selo">TI</div>
+      <div class="aba-cima"></div>
+      <div class="selo">TI</div>
     </div>
   </div>
   <div class="toque" id="toque">toque no envelope para abrir</div>
-  <div class="hint" id="hint">📸 tire um print pra guardar de recordação</div>
-  <div class="rodape">Festa Junina · Turma de TI</div>
+  <div class="acoes" id="acoes">
+    <div class="acoes-row">
+      <a class="btn-share btn-whatsapp" id="btn-wpp" href="#" target="_blank" rel="noopener">💬 Compartilhar no WhatsApp</a>
+      <button class="btn-share btn-copy" id="btn-copy">📋 Copiar mensagem</button>
+    </div>
+    <div class="acoes-hint">📸 tire um print pra guardar de recordação</div>
+  </div>
+  <div class="rodape">
+    Festa Junina · Turma de TI
+    <a href="https://t.me/arraia_correio_bot" target="_blank" rel="noopener">✉️ Ativar meu correio no Telegram</a>
+  </div>
 </div>
+
 <script>
 (function(){
-  const vaga=document.querySelector(".vaga");
-  for(let i=0;i<20;i++){const f=document.createElement("i");
-    f.style.left=Math.random()*100+"%";f.style.bottom=(-10+Math.random()*30)+"%";
-    f.style.animationDuration=(6+Math.random()*7)+"s";f.style.animationDelay=(Math.random()*7)+"s";vaga.appendChild(f);}
+  /* ── Sparkles ── */
+  const vaga = document.querySelector(".vaga");
+  for (let i = 0; i < 20; i++) {
+    const f = document.createElement("i");
+    f.style.left = Math.random() * 100 + "%";
+    f.style.bottom = (-10 + Math.random() * 30) + "%";
+    f.style.animationDuration = (6 + Math.random() * 7) + "s";
+    f.style.animationDelay = (Math.random() * 7) + "s";
+    vaga.appendChild(f);
+  }
 
-  const codigo=location.pathname.split("/").filter(Boolean).pop();
-  fetch("/api/correios/"+codigo).then(r=>{if(!r.ok)throw 0;return r.json();}).then(d=>{
-    const anon=d.anonimo;
-    document.getElementById("c-para").textContent="Para "+d.para;
-    document.getElementById("c-msg").textContent="“"+d.mensagem+"”";
-    document.getElementById("c-de").textContent="— "+d.de;
-    document.getElementById("subtitulo").textContent=
-      anon ? "Alguém pensou em você na festa…" : d.de+" mandou um correio pra você";
-  }).catch(()=>{
-    document.getElementById("cena").innerHTML=
-      '<div class="erro">Esse correio não foi encontrado 🙈<br>Confira o código com a barraca.</div>';
-    document.getElementById("toque").style.display="none";
-    document.getElementById("titulo").textContent="Hmm…";
-    document.getElementById("subtitulo").textContent="";
+  /* ── State ── */
+  let mensagemTexto = "";
+  let paraTexto = "";
+  let deTexto = "";
+
+  /* ── Fetch data ── */
+  const codigo = location.pathname.split("/").filter(Boolean).pop();
+  fetch("/api/correios/" + codigo)
+    .then(r => { if (!r.ok) throw r.status; return r.json(); })
+    .then(d => {
+      const anon = d.anonimo;
+      paraTexto = d.para || "você";
+      mensagemTexto = d.mensagem || "";
+      deTexto = d.de || "Anônimo";
+
+      document.getElementById("c-para").textContent = "Para " + paraTexto;
+      document.getElementById("c-msg").textContent = "“" + mensagemTexto + "”";
+      document.getElementById("de-texto").textContent = "— " + deTexto;
+      document.getElementById("subtitulo").textContent =
+        anon ? "Alguém pensou em você na festa…" : deTexto + " mandou um correio pra você";
+
+      /* WhatsApp link */
+      const shareText = "Recebi um correio elegante no Arraiá TI! 💌\n\n"Para " + paraTexto + "" — " + deTexto + "\n\n"" + mensagemTexto + ""\n\n✨ Arraiá TI · Correio Elegante";
+      document.getElementById("btn-wpp").href = "https://wa.me/?text=" + encodeURIComponent(shareText);
+    })
+    .catch(status => {
+      document.getElementById("cena").innerHTML = `
+        <div class="erro-box">
+          <div class="erro-icon">🙈</div>
+          <h2>Correio não encontrado</h2>
+          <p>Esse código não existe ou já foi removido.<br>Tente novamente com o código da barraca.</p>
+          <div class="erro-dica">💡 Confira o QR Code ou o link recebido<br>e certifique-se de digitá-lo corretamente.</div>
+        </div>`;
+      document.getElementById("toque").style.display = "none";
+      document.getElementById("acoes").style.display = "none";
+      document.getElementById("titulo").textContent = "Hmm…";
+      document.getElementById("subtitulo").textContent = "";
+    });
+
+  /* ── Web Audio chime ── */
+  function tocarChime() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const notes = [523.25, 659.25, 783.99]; /* C5, E5, G5 */
+      notes.forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0, ctx.currentTime + i * 0.18);
+        gain.gain.linearRampToValueAtTime(0.28, ctx.currentTime + i * 0.18 + 0.04);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.18 + 0.7);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(ctx.currentTime + i * 0.18);
+        osc.stop(ctx.currentTime + i * 0.18 + 0.8);
+      });
+    } catch(e) { /* audio not available, silently skip */ }
+  }
+
+  /* ── Canvas confetti ── */
+  function dispararConfetti() {
+    const canvas = document.getElementById("confetti-canvas");
+    canvas.style.display = "block";
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const ctx = canvas.getContext("2d");
+    const CORES = ["#e9b949","#ff9ec7","#c2402f","#4caf50","#2196f3","#ffffff","#ff5722","#9c27b0"];
+    const particles = [];
+    for (let i = 0; i < 150; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: -10 - Math.random() * 200,
+        w: 7 + Math.random() * 8,
+        h: 4 + Math.random() * 5,
+        cor: CORES[Math.floor(Math.random() * CORES.length)],
+        rot: Math.random() * Math.PI * 2,
+        vx: -2 + Math.random() * 4,
+        vy: 2.5 + Math.random() * 3.5,
+        vrot: (-1 + Math.random() * 2) * 0.1,
+        alpha: 1
+      });
+    }
+    const start = performance.now();
+    const DURACAO = 4000;
+    function tick(now) {
+      const elapsed = now - start;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const fade = Math.max(0, 1 - (elapsed - DURACAO * 0.6) / (DURACAO * 0.4));
+      particles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.rot += p.vrot;
+        p.vy += 0.04; /* gravity */
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.globalAlpha = (elapsed > DURACAO * 0.6 ? fade : 1);
+        ctx.fillStyle = p.cor;
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        ctx.restore();
+      });
+      if (elapsed < DURACAO) {
+        requestAnimationFrame(tick);
+      } else {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        canvas.style.display = "none";
+      }
+    }
+    requestAnimationFrame(tick);
+  }
+
+  /* ── Petals ── */
+  function petalas() {
+    for (let i = 0; i < 18; i++) {
+      const p = document.createElement("span");
+      p.className = "petala";
+      p.textContent = ["❤️","💕","🌸","💖","🌼"][i % 5];
+      p.style.left = (Math.random() * 100) + "%";
+      p.style.fontSize = (16 + Math.random() * 22) + "px";
+      p.style.animationDelay = (Math.random() * 0.8) + "s";
+      p.style.animationDuration = (3.2 + Math.random() * 1.8) + "s";
+      document.body.appendChild(p);
+      setTimeout(() => p.remove(), 5200);
+    }
+  }
+
+  /* ── Open envelope ── */
+  const env = document.getElementById("envelope");
+  let aberto = false;
+  function abrir() {
+    if (aberto) return;
+    aberto = true;
+    tocarChime();
+    document.querySelector(".palco").classList.add("aberto");
+    petalas();
+    dispararConfetti();
+  }
+  env.addEventListener("click", abrir);
+  env.addEventListener("keydown", e => {
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); abrir(); }
   });
 
-  const env=document.getElementById("envelope");let aberto=false;
-  function petalas(){for(let i=0;i<18;i++){const p=document.createElement("span");p.className="petala";
-    p.textContent=["❤️","💕","🌸","💖","🌼"][i%5];p.style.left=(Math.random()*100)+"%";
-    p.style.fontSize=(16+Math.random()*22)+"px";p.style.animationDelay=(Math.random()*.8)+"s";
-    p.style.animationDuration=(3.2+Math.random()*1.8)+"s";document.body.appendChild(p);
-    setTimeout(()=>p.remove(),5200);}}
-  function abrir(){if(aberto)return;aberto=true;
-    document.querySelector(".palco").classList.add("aberto");petalas();}
-  env.addEventListener("click",abrir);
-  env.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();abrir();}});
+  /* ── Copy button ── */
+  document.getElementById("btn-copy").addEventListener("click", function() {
+    const txt = ""Para " + paraTexto + "" — " + deTexto + "\n\n"" + mensagemTexto + ""\n\n— Arraiá TI · Correio Elegante";
+    navigator.clipboard.writeText(txt).then(() => {
+      const btn = this;
+      const orig = btn.textContent;
+      btn.textContent = "✅ Copiado!";
+      btn.style.background = "rgba(76,175,80,.35)";
+      btn.style.borderColor = "#4caf50";
+      setTimeout(() => {
+        btn.textContent = orig;
+        btn.style.background = "";
+        btn.style.borderColor = "";
+      }, 2000);
+    }).catch(() => {
+      /* Fallback for browsers that don't support clipboard API */
+      const ta = document.createElement("textarea");
+      ta.value = txt;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      ta.remove();
+      const btn = this;
+      const orig = btn.textContent;
+      btn.textContent = "✅ Copiado!";
+      setTimeout(() => { btn.textContent = orig; }, 2000);
+    });
+  });
 })();
-</script></body></html>
+</script>
+</body></html>

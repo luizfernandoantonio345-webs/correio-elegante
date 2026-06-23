@@ -5,124 +5,542 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Rye&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet" />
 <style>
-  :root{--noite:#15173a;--kraft:#f3e7cf;--fogueira:#ff7a2d;--brasa:#ff3d3d;--milho:#ffc83d;
-    --verde:#3ec46d;--azul:#43b3ff;--rosa:#ff6fae}
-  *{box-sizing:border-box}html,body{margin:0;min-height:100vh}
-  body{font-family:"Outfit",system-ui,sans-serif;color:var(--kraft);padding:22px;
-    background:radial-gradient(1000px 500px at 50% -10%,#2a2c66 0,transparent 60%),
-      radial-gradient(800px 400px at 50% 120%,#3a1230 0,transparent 60%),var(--noite)}
+  :root{
+    --noite:#15173a;--kraft:#f3e7cf;--fogueira:#ff7a2d;--brasa:#ff3d3d;
+    --milho:#ffc83d;--verde:#3ec46d;--azul:#43b3ff;--rosa:#ff6fae
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100vh}
+
+  /* Fundo com gradiente animado suave */
+  body{
+    font-family:"Outfit",system-ui,sans-serif;color:var(--kraft);padding:22px;
+    background:var(--noite);
+    animation:bgshift 18s ease-in-out infinite alternate
+  }
+  @keyframes bgshift{
+    0%{background:
+      radial-gradient(1000px 500px at 50% -10%,#2a2c66 0,transparent 60%),
+      radial-gradient(800px 400px at 50% 120%,#3a1230 0,transparent 60%),
+      #15173a}
+    33%{background:
+      radial-gradient(1000px 500px at 30% -10%,#1e2c60 0,transparent 60%),
+      radial-gradient(800px 400px at 70% 120%,#2a0d28 0,transparent 60%),
+      #14163a}
+    66%{background:
+      radial-gradient(1000px 500px at 70% -10%,#2d1f5e 0,transparent 60%),
+      radial-gradient(800px 400px at 30% 110%,#400d1a 0,transparent 60%),
+      #16183c}
+    100%{background:
+      radial-gradient(1000px 500px at 50% -10%,#2a2c66 0,transparent 60%),
+      radial-gradient(900px 400px at 60% 130%,#3a1230 0,transparent 60%),
+      #15173a}
+  }
+
+  /* Bandeirinhas */
   .bandeirinhas{height:24px;display:flex;overflow:hidden;animation:balanca 3s ease-in-out infinite}
   .bandeirinhas i{flex:1 0 24px;height:24px;clip-path:polygon(0 0,100% 0,50% 100%)}
-  .bandeirinhas i:nth-child(5n+1){background:var(--brasa)}.bandeirinhas i:nth-child(5n+2){background:var(--milho)}
-  .bandeirinhas i:nth-child(5n+3){background:var(--verde)}.bandeirinhas i:nth-child(5n+4){background:var(--azul)}
+  .bandeirinhas i:nth-child(5n+1){background:var(--brasa)}
+  .bandeirinhas i:nth-child(5n+2){background:var(--milho)}
+  .bandeirinhas i:nth-child(5n+3){background:var(--verde)}
+  .bandeirinhas i:nth-child(5n+4){background:var(--azul)}
   .bandeirinhas i:nth-child(5n+5){background:var(--rosa)}
   @keyframes balanca{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
-  h1{font-family:"Rye",serif;color:var(--milho);font-weight:400;text-align:center;font-size:40px;margin:20px 0 24px;
-    text-shadow:0 3px 0 #b8431b,0 0 30px rgba(255,122,45,.4)}
+
+  /* Header */
+  .header-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:0}
+  h1{
+    font-family:"Rye",serif;color:var(--milho);font-weight:400;
+    text-align:center;font-size:40px;margin:20px 0 24px;flex:1;
+    text-shadow:0 3px 0 #b8431b,0 0 30px rgba(255,122,45,.4)
+  }
+
+  /* Top right controls */
+  .top-right{
+    position:fixed;top:18px;right:18px;display:flex;align-items:center;gap:10px;z-index:50
+  }
+  .relogio{
+    font-family:"Rye",serif;font-size:22px;color:var(--milho);
+    text-shadow:0 0 12px rgba(255,200,61,.5);letter-spacing:1px
+  }
+  .sse-badge{
+    display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;
+    padding:5px 11px;border-radius:999px;background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.14);transition:background .3s
+  }
+  .sse-dot{width:8px;height:8px;border-radius:50%;background:var(--brasa)}
+  .sse-badge.conectado .sse-dot{background:var(--verde);animation:pulsar .8s ease-in-out infinite alternate}
+  @keyframes pulsar{from{opacity:.7}to{opacity:1}}
+  .mute-btn{
+    font-size:20px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);
+    border-radius:10px;padding:5px 9px;cursor:pointer;transition:background .15s;line-height:1
+  }
+  .mute-btn:hover{background:rgba(255,255,255,.18)}
+
+  /* Layout */
   .grid{display:grid;grid-template-columns:1.3fr 1fr;gap:20px;max-width:1100px;margin:0 auto}
   @media(max-width:780px){.grid{grid-template-columns:1fr}}
+
+  /* KPI placar */
   .placar{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
-  .kpi{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:18px;text-align:center}
-  .kpi .n{font-family:"Rye",serif;font-size:48px;color:#fff;line-height:1}
+  .kpi{
+    background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
+    border-radius:16px;padding:18px;text-align:center;transition:transform .2s
+  }
+  .kpi:hover{transform:translateY(-2px)}
+  .kpi .n{
+    font-family:"Rye",serif;font-size:48px;color:#fff;line-height:1;
+    transition:transform .15s
+  }
   .kpi.rosa .n{color:var(--rosa);text-shadow:0 0 22px rgba(255,111,174,.6)}
   .kpi .l{margin-top:8px;font-size:13px;text-transform:uppercase;letter-spacing:1px;opacity:.8}
+
+  /* Bloco */
   .bloco{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:20px}
   .bloco h2{margin:0 0 14px;font-size:16px;text-transform:uppercase;letter-spacing:1px;opacity:.85}
-  .feed{display:flex;flex-direction:column;gap:10px;max-height:54vh;overflow:auto}
-  .ev{display:flex;align-items:center;gap:12px;background:rgba(0,0,0,.18);border-radius:12px;padding:12px 14px}
-  .ev .ico{font-size:22px}.ev b{font-size:16px}.ev small{opacity:.7}
-  .ev .tag{margin-left:auto;font-size:11px;font-weight:800;padding:4px 10px;border-radius:999px}
-  .tag.tg{background:#1d6fd1;color:#fff}.tag.lk{background:var(--milho);color:#3a2c00}
+
+  /* Feed */
+  .feed{display:flex;flex-direction:column;gap:10px;max-height:54vh;overflow:auto;scroll-behavior:smooth}
+  .feed::-webkit-scrollbar{width:4px}
+  .feed::-webkit-scrollbar-track{background:transparent}
+  .feed::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2);border-radius:2px}
+  .ev{
+    display:flex;align-items:center;gap:12px;background:rgba(0,0,0,.18);
+    border-radius:12px;padding:12px 14px;transition:background .2s
+  }
+  .ev.novo-item{animation:slideRight .4s cubic-bezier(.22,1,.36,1)}
+  @keyframes slideRight{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:translateX(0)}}
+  .ev:hover{background:rgba(0,0,0,.28)}
+  .ev .ico{font-size:22px}
+  .ev b{font-size:16px}
+  .ev small{opacity:.7}
+  .ev .tag{margin-left:auto;font-size:11px;font-weight:800;padding:4px 10px;border-radius:999px;white-space:nowrap}
+  .tag.tg{background:#1d6fd1;color:#fff}
+  .tag.lk{background:var(--milho);color:#3a2c00}
+  .ev .tempo{font-size:11px;opacity:.55;margin-top:2px}
+  .vazio{opacity:.6;text-align:center;padding:24px}
+
+  /* QR Ativar — maior e mais bonito */
   .ativar{text-align:center}
-  .ativar .qrwrap{background:#fff;display:inline-block;padding:14px;border-radius:16px;margin:6px 0 12px}
+  .ativar h2{margin:0 0 16px}
+  .qrwrap{
+    display:inline-block;padding:16px;border-radius:20px;background:#fff;
+    margin:8px 0 16px;
+    box-shadow:0 0 0 4px var(--rosa),0 0 0 8px rgba(255,111,174,.25);
+    animation:qrpulse 2.5s ease-in-out infinite
+  }
+  @keyframes qrpulse{
+    0%,100%{box-shadow:0 0 0 4px var(--rosa),0 0 0 8px rgba(255,111,174,.25)}
+    50%{box-shadow:0 0 0 6px var(--rosa),0 0 0 14px rgba(255,111,174,.12)}
+  }
+  .botname-destaque{
+    font-family:"Rye",serif;font-size:22px;color:var(--milho);
+    text-shadow:0 0 14px rgba(255,200,61,.4);margin:0 0 8px
+  }
   .ativar p{font-size:15px;opacity:.9;margin:4px 0}
   .ativar .passo{font-family:"Rye",serif;color:var(--milho);font-size:20px;margin-top:8px}
-  .vazio{opacity:.6;text-align:center;padding:24px}
-  #tflash{position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;
-    background:radial-gradient(circle,#5a1140,#180312);text-align:center;padding:24px;overflow:hidden}
+  .ativar .bot-sub{opacity:.55;font-size:13px}
+
+  /* Flash de novo correio */
+  #tflash{
+    position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;
+    background:radial-gradient(circle,#5a1140,#180312);text-align:center;padding:24px;overflow:hidden
+  }
   #tflash.show{display:flex;animation:tfin .3s ease}
   @keyframes tfin{from{opacity:0}to{opacity:1}}
   #tflash .t{font-family:"Rye",serif;color:#ff9ec7;font-size:30px}
-  #tflash .nome{font-family:"Rye",serif;color:#fff;font-size:64px;margin:10px 0;
-    text-shadow:0 0 30px rgba(255,111,174,.6);animation:pop .5s ease}
+  #tflash .nome{
+    font-family:"Rye",serif;color:#fff;font-size:64px;margin:10px 0;
+    text-shadow:0 0 30px rgba(255,111,174,.6);animation:pop .5s ease
+  }
   @media(max-width:640px){#tflash .nome{font-size:42px}}
   @keyframes pop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
   #tflash .s{color:var(--kraft);font-size:22px;opacity:.9}
   #tflash .cor{position:absolute;bottom:-40px;animation:up 3.4s ease-in forwards}
   @keyframes up{to{transform:translateY(-110vh) rotate(18deg);opacity:0}}
-</style></head><body>
-  <div id="tflash"></div>
-  <div class="bandeirinhas" id="band"></div>
-  <h1>💌 Correio Elegante do Arraiá</h1>
-  <div class="grid">
-    <div>
-      <div class="placar">
-        <div class="kpi rosa"><div class="n" id="k-total">0</div><div class="l">Correios</div></div>
-        <div class="kpi"><div class="n" id="k-entregues">0</div><div class="l">Entregues</div></div>
-        <div class="kpi"><div class="n" id="k-reg">0</div><div class="l">No Telegram</div></div>
-      </div>
-      <div class="bloco">
-        <h2>📡 Chegando agora</h2>
-        <div class="feed" id="feed"><div class="vazio">Esperando o primeiro correio… 💕</div></div>
-      </div>
+
+  /* Flash de marco (milestone) */
+  #marco-flash{
+    position:fixed;inset:0;z-index:90;display:none;align-items:center;justify-content:center;
+    background:rgba(0,0,0,.75);text-align:center;padding:24px
+  }
+  #marco-flash.show{display:flex;animation:tfin .4s ease}
+  #marco-flash .marco-inner{
+    background:linear-gradient(135deg,#2d0b3f,#3a1230);
+    border:3px solid var(--milho);border-radius:28px;padding:44px 56px;
+    box-shadow:0 0 60px rgba(255,200,61,.35)
+  }
+  #marco-flash .marco-num{font-family:"Rye",serif;font-size:80px;color:var(--milho);line-height:1}
+  #marco-flash .marco-txt{font-family:"Rye",serif;font-size:28px;color:var(--kraft);margin-top:8px}
+
+  /* Confetti canvas */
+  #confetti-canvas{position:fixed;inset:0;pointer-events:none;z-index:9999;width:100%;height:100%}
+</style>
+</head><body>
+<canvas id="confetti-canvas"></canvas>
+<div id="tflash"></div>
+<div id="marco-flash"><div class="marco-inner"><div class="marco-num" id="marco-n">10</div><div class="marco-txt">🎉 Correios enviados!</div></div></div>
+
+<div class="top-right">
+  <div class="sse-badge" id="sse-badge">
+    <span class="sse-dot"></span>
+    <span id="sse-txt">conectando…</span>
+  </div>
+  <button class="mute-btn" id="mute-btn" title="Silenciar/Ativar som">🔔</button>
+  <div class="relogio" id="relogio">00:00:00</div>
+</div>
+
+<div class="bandeirinhas" id="band"></div>
+<h1>💌 Correio Elegante do Arraiá</h1>
+
+<div class="grid">
+  <div>
+    <div class="placar">
+      <div class="kpi rosa"><div class="n" id="k-total">0</div><div class="l">Correios</div></div>
+      <div class="kpi"><div class="n" id="k-entregues">0</div><div class="l">Entregues</div></div>
+      <div class="kpi"><div class="n" id="k-reg">0</div><div class="l">No Telegram</div></div>
     </div>
-    <div class="bloco ativar">
-      <h2>📲 Ative seu correio</h2>
-      <div class="qrwrap"><div id="qr-bot"></div></div>
-      <p class="passo">Escaneie e dê /start</p>
-      <p>Assim o correio chega <b>direto no seu celular</b> pelo Telegram!</p>
-      <p id="botname" style="opacity:.6;font-size:13px"></p>
+    <div class="bloco">
+      <h2>📡 Chegando agora</h2>
+      <div class="feed" id="feed"><div class="vazio">Esperando o primeiro correio… 💕</div></div>
     </div>
   </div>
-<script>
-  const band=document.getElementById("band");for(let i=0;i<40;i++)band.appendChild(document.createElement("i"));
-  const $=id=>document.getElementById(id);
 
-  fetch("/api/info").then(r=>r.json()).then(d=>{
-    if(d.bot_username && window.QRCode){
-      const link="https://t.me/"+d.bot_username+"?start=festa";
-      new QRCode($("qr-bot"),{text:link,width:200,height:200});
-      $("botname").textContent="@"+d.bot_username;
+  <div class="bloco ativar">
+    <h2>📲 Ative seu correio</h2>
+    <div class="qrwrap"><div id="qr-bot"></div></div>
+    <div class="botname-destaque" id="botname-destaque" style="display:none"></div>
+    <p class="passo">Escaneie e dê /start</p>
+    <p>Assim o correio chega <b>direto no seu celular</b> pelo Telegram!</p>
+    <p class="bot-sub" id="botname"></p>
+  </div>
+</div>
+
+<script>
+// ── Bandeirinhas ──────────────────────────────────────────────────────────────
+const band = document.getElementById("band");
+for (let i = 0; i < 40; i++) band.appendChild(document.createElement("i"));
+const $ = id => document.getElementById(id);
+
+// ── Relógio ───────────────────────────────────────────────────────────────────
+function atualizarRelogio() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2, "0");
+  const m = String(now.getMinutes()).padStart(2, "0");
+  const s = String(now.getSeconds()).padStart(2, "0");
+  $("relogio").textContent = h + ":" + m + ":" + s;
+}
+atualizarRelogio();
+setInterval(atualizarRelogio, 1000);
+
+// ── Som (Web Audio API) ───────────────────────────────────────────────────────
+let mutado = false;
+let audioCtx = null;
+
+function tocarChime() {
+  if (mutado) return;
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const ctx = audioCtx;
+    // Sequência de notas — C5, E5, G5 (triade maior)
+    const notas = [523.25, 659.25, 783.99];
+    notas.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = "sine";
+      osc.frequency.value = freq;
+      const t = ctx.currentTime + i * 0.18;
+      gain.gain.setValueAtTime(0, t);
+      gain.gain.linearRampToValueAtTime(0.22, t + 0.04);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.55);
+      osc.start(t);
+      osc.stop(t + 0.6);
+    });
+  } catch (_) {}
+}
+
+$("mute-btn").onclick = () => {
+  mutado = !mutado;
+  $("mute-btn").textContent = mutado ? "🔕" : "🔔";
+  // Inicializa AudioContext no primeiro clique (política do navegador)
+  if (!audioCtx) {
+    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch (_) {}
+  }
+};
+
+// ── SSE status ─────────────────────────────────────────────────────────────────
+function setSseStatus(status) {
+  const badge = $("sse-badge");
+  const txt = $("sse-txt");
+  if (status === "ok") {
+    badge.className = "sse-badge conectado";
+    txt.textContent = "conectado";
+  } else {
+    badge.className = "sse-badge";
+    txt.textContent = "reconectando…";
+  }
+}
+
+// ── Contador animado (rolling) ────────────────────────────────────────────────
+const kpiAtual = { total: 0, entregues: 0, reg: 0 };
+
+function animarContador(el, de, para, duracao) {
+  const inicio = performance.now();
+  const diff = para - de;
+  if (diff === 0) return;
+  function frame(agora) {
+    const t = Math.min((agora - inicio) / duracao, 1);
+    const ease = 1 - Math.pow(1 - t, 3); // easeOutCubic
+    el.textContent = Math.round(de + diff * ease);
+    if (t < 1) requestAnimationFrame(frame);
+    else el.textContent = para;
+  }
+  requestAnimationFrame(frame);
+}
+
+function atualizarKpi(total, entregues, reg) {
+  animarContador($("k-total"), kpiAtual.total, total, 600);
+  animarContador($("k-entregues"), kpiAtual.entregues, entregues, 600);
+  animarContador($("k-reg"), kpiAtual.reg, reg, 600);
+  kpiAtual.total = total;
+  kpiAtual.entregues = entregues;
+  kpiAtual.reg = reg;
+}
+
+// ── Tempo relativo ────────────────────────────────────────────────────────────
+function tempoRelativo(isoStr) {
+  if (!isoStr) return "";
+  const d = new Date(isoStr);
+  if (isNaN(d)) return "";
+  const diff = Math.floor((Date.now() - d.getTime()) / 1000);
+  if (diff < 10) return "agora";
+  if (diff < 60) return "há " + diff + "s";
+  const m = Math.floor(diff / 60);
+  if (m < 60) return "há " + m + " min";
+  const h = Math.floor(m / 60);
+  return "há " + h + "h";
+}
+
+// ── Escape HTML ───────────────────────────────────────────────────────────────
+function esc(s) { return (s || "").replace(/[&<>"]/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[m])); }
+
+// ── Build item do feed ────────────────────────────────────────────────────────
+function buildItem(c, isNovo) {
+  const e = document.createElement("div");
+  e.className = "ev" + (isNovo ? " novo-item" : "");
+  const tg = c.via === "telegram";
+  const tempo = c.criado_em ? `<div class="tempo">${tempoRelativo(c.criado_em)}</div>` : `<small>código ${esc(c.codigo)}</small>`;
+  e.innerHTML = `
+    <span class="ico">💌</span>
+    <div style="flex:1;min-width:0">
+      <b>${esc(c.para)}</b><br>
+      ${tempo}
+    </div>
+    <span class="tag ${tg ? "tg" : "lk"}">${tg ? "TELEGRAM" : "QR / LINK"}</span>`;
+  return e;
+}
+
+// ── Atualizar feed ────────────────────────────────────────────────────────────
+let feedData = [];
+
+function renderFeed(lista, novoId) {
+  feedData = lista;
+  const feed = $("feed");
+  if (!lista.length) {
+    feed.innerHTML = '<div class="vazio">Esperando o primeiro correio… 💕</div>';
+    return;
+  }
+  feed.innerHTML = "";
+  lista.forEach(c => {
+    const isNovo = novoId && (c.codigo === novoId || c.id === novoId);
+    feed.appendChild(buildItem(c, isNovo));
+  });
+  if (novoId) {
+    // Scroll suave para o topo (mais novo)
+    feed.scrollTo({ top: 0, behavior: "smooth" });
+  }
+}
+
+// ── Atualizar tudo via API ────────────────────────────────────────────────────
+function atualizar(novoId) {
+  fetch("/api/telao")
+    .then(r => r.json())
+    .then(d => {
+      atualizarKpi(d.total, d.entregues, d.registrados);
+      renderFeed(d.feed || [], novoId || null);
+    })
+    .catch(() => {});
+}
+
+// ── Info do bot ───────────────────────────────────────────────────────────────
+fetch("/api/info")
+  .then(r => r.json())
+  .then(d => {
+    if (d.bot_username && window.QRCode) {
+      const link = "https://t.me/" + d.bot_username + "?start=festa";
+      new QRCode($("qr-bot"), { text: link, width: 220, height: 220 });
+      $("botname").textContent = "@" + d.bot_username;
+      const dest = $("botname-destaque");
+      dest.textContent = "@" + d.bot_username;
+      dest.style.display = "block";
     } else {
-      $("qr-bot").innerHTML="";
-      $("botname").textContent="(configure o bot p/ liberar o Telegram)";
+      $("qr-bot").innerHTML = "";
+      $("botname").textContent = "(configure o bot p/ liberar o Telegram)";
+    }
+  })
+  .catch(() => {});
+
+// ── Flash de correio ──────────────────────────────────────────────────────────
+let flashT;
+function flashTelao(nome) {
+  const f = $("tflash");
+  f.className = "show";
+  f.innerHTML = `<div>
+    <div class="t">💌 Você recebeu um correio!</div>
+    <div class="nome">${esc(nome)}</div>
+    <div class="s">Procure seu código no telão e escaneie pra ler ❤️</div>
+  </div>`;
+  for (let i = 0; i < 14; i++) {
+    const h = document.createElement("span");
+    h.className = "cor";
+    h.textContent = ["❤️", "💕", "💌", "💖"][i % 4];
+    h.style.left = (Math.random() * 100) + "%";
+    h.style.fontSize = (22 + Math.random() * 26) + "px";
+    h.style.animationDelay = (Math.random() * 0.6) + "s";
+    f.appendChild(h);
+  }
+  clearTimeout(flashT);
+  flashT = setTimeout(() => { f.className = ""; }, 4000);
+}
+
+// ── Marco (milestone) ────────────────────────────────────────────────────────
+let marcoT;
+function flashMarco(num) {
+  $("marco-n").textContent = num;
+  const f = $("marco-flash");
+  f.className = "show";
+  clearTimeout(marcoT);
+  marcoT = setTimeout(() => { f.className = ""; }, 3000);
+}
+
+// ── Confetti ──────────────────────────────────────────────────────────────────
+(function() {
+  const canvas = document.getElementById("confetti-canvas");
+  const ctx = canvas.getContext("2d");
+  let particles = [];
+  let animFrame = null;
+  let running = false;
+  const COLORS = ["#ff6fae","#ffc83d","#3ec46d","#43b3ff","#ff7a2d","#ff3d3d","#a259ff","#fff"];
+
+  function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+  window.addEventListener("resize", resize);
+  resize();
+
+  function Particle() {
+    this.x = Math.random() * canvas.width;
+    this.y = -10;
+    this.r = 5 + Math.random() * 8;
+    this.color = COLORS[Math.floor(Math.random() * COLORS.length)];
+    this.vx = (Math.random() - 0.5) * 5;
+    this.vy = 3 + Math.random() * 5;
+    this.angle = Math.random() * Math.PI * 2;
+    this.spin = (Math.random() - 0.5) * 0.22;
+    this.shape = Math.random() > 0.4 ? "rect" : "circle";
+    this.alpha = 1;
+  }
+  Particle.prototype.update = function() {
+    this.x += this.vx;
+    this.y += this.vy;
+    this.angle += this.spin;
+    this.vy += 0.09;
+    if (this.y > canvas.height * 0.65) this.alpha -= 0.04;
+  };
+  Particle.prototype.draw = function() {
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, this.alpha);
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.angle);
+    ctx.fillStyle = this.color;
+    if (this.shape === "rect") {
+      ctx.fillRect(-this.r / 2, -this.r / 2, this.r, this.r * 0.45);
+    } else {
+      ctx.beginPath();
+      ctx.arc(0, 0, this.r / 2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+  };
+
+  function loop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles = particles.filter(p => p.alpha > 0);
+    particles.forEach(p => { p.update(); p.draw(); });
+    if (particles.length > 0) { animFrame = requestAnimationFrame(loop); }
+    else { running = false; cancelAnimationFrame(animFrame); }
+  }
+
+  window.dispararConfetti = function(n) {
+    resize();
+    const count = n || 120;
+    for (let i = 0; i < count; i++) {
+      setTimeout(() => particles.push(new Particle()), Math.random() * 600);
+    }
+    if (!running) { running = true; loop(); }
+  };
+})();
+
+// ── SSE ───────────────────────────────────────────────────────────────────────
+let ultimoTotal = 0;
+
+function conectarSSE() {
+  let es;
+  try { es = new EventSource("/api/stream"); } catch (_) { return; }
+
+  es.onopen = () => setSseStatus("ok");
+
+  es.onmessage = (e) => {
+    try {
+      const d = JSON.parse(e.data);
+      if (d && d.tipo === "novo") {
+        tocarChime();
+        flashTelao(d.para);
+        dispararConfetti(100);
+        atualizar(d.codigo);
+
+        // Marco a cada 10 correios
+        const novoTotal = kpiAtual.total + 1;
+        if (novoTotal > 0 && novoTotal % 10 === 0) {
+          setTimeout(() => flashMarco(novoTotal), 4200);
+          setTimeout(() => dispararConfetti(200), 4200);
+        }
+      }
+    } catch (_) {}
+  };
+
+  es.onerror = () => {
+    setSseStatus("erro");
+    es.close();
+    setTimeout(conectarSSE, 5000);
+  };
+}
+
+conectarSSE();
+atualizar();
+setInterval(atualizar, 8000);
+
+// Atualiza tempos relativos no feed a cada 30 segundos
+setInterval(() => {
+  const feed = $("feed");
+  const items = feed.querySelectorAll(".ev");
+  items.forEach((el, i) => {
+    if (!feedData[i]) return;
+    const tempoEl = el.querySelector(".tempo");
+    if (tempoEl && feedData[i].criado_em) {
+      tempoEl.textContent = tempoRelativo(feedData[i].criado_em);
     }
   });
-
-  function atualizar(){
-    fetch("/api/telao").then(r=>r.json()).then(d=>{
-      $("k-total").textContent=d.total;
-      $("k-entregues").textContent=d.entregues;
-      $("k-reg").textContent=d.registrados;
-      const feed=$("feed");
-      if(!d.feed.length){ feed.innerHTML='<div class="vazio">Esperando o primeiro correio… 💕</div>'; return; }
-      feed.innerHTML="";
-      d.feed.forEach(c=>{
-        const e=document.createElement("div"); e.className="ev";
-        const tg=c.via==="telegram";
-        e.innerHTML=`<span class="ico">💌</span>
-          <div><b>${c.para}</b><br><small>código ${c.codigo}</small></div>
-          <span class="tag ${tg?'tg':'lk'}">${tg?'TELEGRAM':'QR / LINK'}</span>`;
-        feed.appendChild(e);
-      });
-    }).catch(()=>{});
-  }
-  function esc(s){return (s||"").replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));}
-  let flashT;
-  function flashTelao(nome){
-    const f=$("tflash"); f.className="show";
-    f.innerHTML=`<div><div class="t">💌 Você recebeu um correio!</div>
-      <div class="nome">${esc(nome)}</div>
-      <div class="s">Procure seu código no telão e escaneie pra ler ❤️</div></div>`;
-    for(let i=0;i<14;i++){const h=document.createElement("span");h.className="cor";
-      h.textContent=["❤️","💕","💌","💖"][i%4];h.style.left=(Math.random()*100)+"%";
-      h.style.fontSize=(22+Math.random()*26)+"px";h.style.animationDelay=(Math.random()*.6)+"s";f.appendChild(h);}
-    clearTimeout(flashT); flashT=setTimeout(()=>{f.className="";},4000);
-  }
-  try{
-    const es=new EventSource("/api/stream");
-    es.onmessage=(e)=>{ try{const d=JSON.parse(e.data); if(d&&d.tipo==="novo"){ flashTelao(d.para); atualizar(); }}catch(_){} };
-  }catch(_){}
-
-  atualizar(); setInterval(atualizar,8000);
-</script></body></html>
+}, 30000);
+</script>
+</body></html>
