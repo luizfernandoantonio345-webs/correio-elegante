@@ -351,6 +351,32 @@ def admin_listar(key: str):
                  "quando": c.criado_em.strftime("%d/%m %H:%M") if c.criado_em else ""}
                 for c in cs]
 
+@app.post("/api/admin/registrar-usuario")
+def admin_registrar_usuario(key: str, chat_id: int, codinome: str, username: str = ""):
+    checa_admin(key)
+    with Session(engine) as s:
+        u = s.get(Usuario, chat_id)
+        if not u:
+            u = Usuario(chat_id=chat_id, username=username,
+                        codinome=codinome, aguardando_codinome=False)
+            s.add(u)
+        else:
+            u.codinome = codinome
+            u.aguardando_codinome = False
+            if username:
+                u.username = username
+        s.commit()
+        return {"chat_id": u.chat_id, "codinome": u.codinome, "ok": True}
+
+@app.get("/api/admin/usuarios")
+def admin_usuarios(key: str):
+    checa_admin(key)
+    with Session(engine) as s:
+        us = s.scalars(select(Usuario)).all()
+        return [{"chat_id": u.chat_id, "codinome": u.codinome,
+                 "username": u.username, "aguardando": u.aguardando_codinome}
+                for u in us]
+
 @app.post("/api/admin/ocultar/{codigo}")
 def admin_ocultar(codigo: str, key: str, ocultar: bool = True):
     checa_admin(key)
