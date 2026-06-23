@@ -3,395 +3,474 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="manifest" href="/static/manifest.json" />
 <title>Você recebeu um correio 💌</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Caveat:wght@600;700&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Caveat:wght@600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <style>
-  :root{
-    --noite:#170d2b;--vinho:#37102e;--papel:#f7eedb;--papel-2:#efe2c6;
-    --tinta:#3a2c1f;--tinta-2:#8a7355;--ouro:#e9b949;--selo:#c2402f;--rosa:#ff9ec7
-  }
-  *{box-sizing:border-box}html,body{margin:0;height:100%}
+:root{
+  --bg:#0d0d1a;--pink:#ff6b9d;--gold:#ffd700;--teal:#00e5ff;--purple:#c44dff;
+  --text:#f0f0f8;--muted:#8888aa;
+  --papel:#faf4e8;--papel2:#efe0c4;--tinta:#2d2316;--tinta2:#7a6548;--selo:#c0392b;
+  --grad:linear-gradient(135deg,#ff6b9d,#c44dff,#00e5ff)
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:'Outfit',system-ui,sans-serif;background:var(--bg);color:var(--text);
+  min-height:100dvh;overflow:hidden;position:relative
+}
 
-  /* Animated background gradient */
-  @keyframes gradshift{
-    0%  {background-position:0% 50%}
-    50% {background-position:100% 50%}
-    100%{background-position:0% 50%}
-  }
-  body{
-    font-family:"Outfit",system-ui,sans-serif;color:var(--papel);min-height:100dvh;
-    display:grid;place-items:center;padding:24px;overflow:hidden;position:relative;
-    background:linear-gradient(-45deg,#170d2b,#37102e,#1e0a3c,#2c1045,#3d0f2b,#170d2b);
-    background-size:400% 400%;
-    animation:gradshift 12s ease infinite
-  }
+/* Animated bg */
+.bg-anim{
+  position:fixed;inset:0;z-index:0;
+  background:linear-gradient(-45deg,#0d0d1a,#1a0d2e,#1f0a1a,#0d0f2e);
+  background-size:400% 400%;
+  animation:bgmove 14s ease infinite
+}
+@keyframes bgmove{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
 
-  /* vinheta */
-  body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:3;
-    box-shadow:inset 0 0 220px 40px rgba(0,0,0,.45)}
+/* Particles */
+.particles{position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden}
+.p{position:absolute;border-radius:50%;background:radial-gradient(circle,#fff9c0,#ffc83d);
+   box-shadow:0 0 8px #ffc83d;animation:pfloat linear infinite;opacity:0}
+@keyframes pfloat{
+  0%{transform:translateY(0) translateX(0);opacity:0}
+  15%{opacity:.8}85%{opacity:.4}
+  100%{transform:translateY(-70vh) translateX(25px);opacity:0}
+}
 
-  /* Floating sparkles */
-  .vaga{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
-  .vaga i{position:absolute;width:5px;height:5px;border-radius:50%;
-    background:radial-gradient(circle,#fff6c8,#ffcf6b);box-shadow:0 0 12px #ffcf6b;
-    animation:flutua linear infinite;opacity:0}
-  @keyframes flutua{
-    0%{transform:translateY(20px);opacity:0}
-    20%{opacity:.9}80%{opacity:.6}
-    100%{transform:translateY(-65vh) translateX(24px);opacity:0}
-  }
+/* ── Confetti canvas ── */
+#confetti-canvas{position:fixed;inset:0;z-index:100;pointer-events:none;display:none}
 
-  /* Canvas confetti */
-  #confetti-canvas{position:fixed;inset:0;pointer-events:none;z-index:20;display:none}
+/* ══════════════════════════════════════════════════
+   CENA 1: ENVELOPE SELADO
+══════════════════════════════════════════════════ */
+#scene-envelope{
+  position:fixed;inset:0;z-index:10;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;
+  padding:24px;
+  transition:opacity .5s ease,transform .5s ease
+}
+#scene-envelope.saindo{opacity:0;transform:scale(1.08);pointer-events:none}
 
-  .palco{position:relative;z-index:2;width:100%;max-width:430px;text-align:center}
-  .chamada{margin-bottom:22px;animation:sobe .7s ease both}
-  .chamada .selo-cima{font-size:12px;letter-spacing:4px;text-transform:uppercase;color:var(--ouro);opacity:.85}
-  .chamada h1{font-family:"Playfair Display",serif;font-weight:700;font-size:26px;margin:10px 0 6px;color:#fff}
-  .chamada p{margin:0;color:var(--rosa);font-size:15px}
+.badge-arraia{
+  font-size:11px;letter-spacing:4px;text-transform:uppercase;
+  color:var(--gold);opacity:.8;animation:fadein .8s ease
+}
 
-  .cena{perspective:1500px}
-  .envelope{
-    position:relative;width:100%;aspect-ratio:1.5/1;cursor:pointer;
-    filter:drop-shadow(0 28px 46px rgba(0,0,0,.5));
-    transition:transform .5s ease;
-    animation:flutuar 5s ease-in-out infinite
-  }
-  @keyframes flutuar{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-  .envelope:active{transform:scale(.99)}
-  .corpo{position:absolute;inset:0;border-radius:15px;background:linear-gradient(160deg,#82304e,#5d1c38);overflow:hidden}
-  .corpo::before{content:"";position:absolute;inset:0;
-    background:linear-gradient(45deg,transparent 49.5%,rgba(255,255,255,.08) 50%,transparent 50.5%);
-    background-size:15px 15px;opacity:.5}
-  .aba-baixo{position:absolute;inset:0;z-index:3;border-radius:15px;background:linear-gradient(160deg,#8f3656,#6a223f);
-    clip-path:polygon(0 32%,50% 100%,100% 32%,100% 100%,0 100%)}
-  .aba-lado{position:absolute;inset:0;z-index:2;border-radius:15px;background:linear-gradient(160deg,#82304e,#5d1c38);
-    clip-path:polygon(0 0,50% 56%,100% 0,100% 100%,0 100%);opacity:.55}
+.titulo-env{text-align:center;animation:fadein .9s ease .1s both}
+.titulo-env h1{
+  font-family:'Playfair Display',serif;font-size:clamp(1.4rem,5vw,2.1rem);
+  font-weight:700;color:#fff;margin-bottom:6px
+}
+.titulo-env p{font-size:.9rem;color:var(--muted)}
 
-  .carta{
-    position:absolute;left:6%;right:6%;bottom:8%;z-index:4;color:var(--tinta);
-    border-radius:11px;padding:24px 22px;text-align:left;box-shadow:0 12px 26px rgba(0,0,0,.32);
-    background:linear-gradient(150deg,var(--papel),var(--papel-2));
-    transform:translateY(8%);opacity:0;transition:.8s cubic-bezier(.2,.8,.2,1) .15s;max-height:62%;overflow:hidden
-  }
-  .carta::before{content:"";position:absolute;inset:0;border-radius:11px;pointer-events:none;
-    background:radial-gradient(120% 60% at 80% 0%,rgba(255,255,255,.5),transparent 60%),
-      repeating-linear-gradient(0deg,transparent 0 27px,rgba(138,115,85,.10) 27px 28px);opacity:.5}
-  .carta .selo-titulo{font-family:"Playfair Display",serif;font-size:13px;letter-spacing:3px;
-    text-transform:uppercase;color:var(--selo);opacity:.75;margin-bottom:10px}
-  .carta .para{font-size:13px;color:var(--tinta-2);margin-bottom:6px}
-  .carta .msg{font-family:"Playfair Display",serif;font-size:19px;line-height:1.5;font-style:italic;color:#322517}
-  .carta .de{
-    font-family:"Caveat",cursive;font-size:26px;margin-top:16px;color:var(--selo);text-align:right;
-    display:flex;align-items:center;justify-content:flex-end;gap:8px
-  }
-  .de-heart{display:inline-block;opacity:0;transition:opacity .4s .6s}
-  @keyframes heartbeat{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+/* Envelope CSS 3D */
+.env-wrap{
+  perspective:1400px;cursor:pointer;
+  width:min(320px,85vw);
+  animation:fadein 1s ease .2s both
+}
+.env-wrap:hover .envelope-3d{transform:translateY(-6px) rotateX(3deg)}
+.env-wrap:active .envelope-3d{transform:scale(.97)}
+.envelope-3d{
+  position:relative;width:100%;aspect-ratio:1.5/1;
+  filter:drop-shadow(0 32px 56px rgba(0,0,0,.65));
+  transition:transform .35s ease
+}
 
-  .aba-cima{
-    position:absolute;left:0;right:0;top:0;height:60%;z-index:6;transform-origin:top;
-    background:linear-gradient(160deg,#8f3656,#6a223f);border-radius:15px 15px 0 0;
-    clip-path:polygon(0 0,50% 100%,100% 0);transition:transform .6s ease,z-index 0s .3s
-  }
-  .selo{
-    position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);z-index:7;width:58px;height:58px;
-    border-radius:50%;background:radial-gradient(circle at 36% 32%,#e9684f,var(--selo));
-    display:grid;place-items:center;
-    box-shadow:0 5px 12px rgba(0,0,0,.4),inset 0 -3px 6px rgba(0,0,0,.25);
-    font-family:"Playfair Display",serif;font-weight:700;color:#fff3e0;font-size:19px;
-    transition:.45s;overflow:hidden
-  }
-  .selo::after{content:"";position:absolute;inset:0;
-    background:linear-gradient(120deg,transparent 35%,rgba(255,255,255,.5) 50%,transparent 65%);
-    transform:translateX(-120%);animation:brilho 3.2s ease-in-out infinite}
-  @keyframes brilho{0%,60%{transform:translateX(-120%)}80%,100%{transform:translateX(120%)}}
+/* Corpo do envelope */
+.env-corpo{
+  position:absolute;inset:0;border-radius:14px;
+  background:linear-gradient(145deg,#9a3860,#7a2447,#5c1831);
+  overflow:hidden
+}
+.env-corpo::before{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(45deg,transparent 0,transparent 12px,rgba(255,255,255,.03) 12px,rgba(255,255,255,.03) 24px)
+}
 
-  .toque{margin-top:18px;color:var(--papel);opacity:.78;font-size:14px;letter-spacing:.5px;animation:pisca 1.8s ease-in-out infinite}
-  @keyframes pisca{50%{opacity:.4}}
+/* Linhas diagonais do envelope */
+.env-lv{
+  position:absolute;inset:0;z-index:2;
+  background:linear-gradient(155deg,#8f3656,#6a2240);
+  clip-path:polygon(0 0,50% 60%,100% 0,100% 100%,0 100%);
+  opacity:.55
+}
+.env-lh{
+  position:absolute;inset:0;z-index:2;
+  background:linear-gradient(155deg,#9a3860,#7a2447);
+  clip-path:polygon(0 100%,50% 40%,100% 100%);
+  opacity:.4
+}
 
-  /* Share buttons area */
-  .acoes{margin-top:18px;display:flex;flex-direction:column;align-items:center;gap:10px;opacity:0;pointer-events:none;transition:opacity .6s .5s}
-  .acoes-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
-  .btn-share{
-    display:inline-flex;align-items:center;gap:7px;
-    font-family:"Outfit",sans-serif;font-size:14px;font-weight:600;
-    border:none;border-radius:30px;padding:11px 20px;cursor:pointer;
-    text-decoration:none;transition:transform .15s,filter .15s;letter-spacing:.3px
-  }
-  .btn-share:hover{transform:translateY(-2px);filter:brightness(1.1)}
-  .btn-share:active{transform:scale(.97)}
-  .btn-whatsapp{background:#25D366;color:#fff}
-  .btn-copy{background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3);backdrop-filter:blur(6px)}
-  .acoes-hint{font-size:12px;color:var(--ouro);opacity:.8;letter-spacing:.5px}
+/* Aba superior (flap) — vai abrir */
+.env-flap{
+  position:absolute;top:0;left:0;right:0;height:62%;z-index:5;
+  transform-origin:top center;
+  background:linear-gradient(145deg,#b04070,#8a2d55,#6a1a3a);
+  clip-path:polygon(0 0,50% 100%,100% 0);
+  border-radius:14px 14px 0 0;
+  transition:transform .65s cubic-bezier(.4,0,.2,1)
+}
+.env-wrap.abrindo .env-flap{transform:rotateX(-175deg)}
 
-  /* Open state */
-  .aberto .aba-cima{transform:rotateX(180deg);z-index:1}
-  .aberto .selo{transform:translate(-50%,-50%) scale(.35);opacity:0}
-  .aberto .carta{transform:translateY(-48%);opacity:1;max-height:none}
-  .aberto .envelope{aspect-ratio:1.16/1;animation:none}
-  .aberto .toque{opacity:0;pointer-events:none}
-  .aberto .acoes{opacity:1;pointer-events:auto}
-  .aberto .de-heart{opacity:1;animation:heartbeat .9s ease-in-out infinite}
+/* Selo */
+.env-seal{
+  position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);z-index:6;
+  width:52px;height:52px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#ff8c60,var(--selo));
+  box-shadow:0 4px 16px rgba(0,0,0,.5),inset 0 -2px 6px rgba(0,0,0,.3);
+  display:grid;place-items:center;font-size:22px;
+  transition:transform .4s ease,opacity .3s ease;
+  overflow:hidden
+}
+.env-seal::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.5) 50%,transparent 70%);
+  transform:translateX(-120%);animation:shine 3s ease-in-out infinite
+}
+@keyframes shine{0%,60%{transform:translateX(-120%)}80%,100%{transform:translateX(120%)}}
+.env-wrap.abrindo .env-seal{transform:translate(-50%,-50%) scale(0) rotate(180deg);opacity:0}
 
-  .rodape{margin-top:20px;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--ouro);opacity:.6}
-  .rodape a{color:var(--ouro);opacity:.7;text-decoration:none;display:block;margin-top:8px;font-size:11px;letter-spacing:1.5px}
-  .rodape a:hover{opacity:1;text-decoration:underline}
+/* Hint piscante */
+.env-hint{
+  font-size:14px;color:var(--pink);letter-spacing:1px;opacity:.85;
+  animation:pisca 2s ease-in-out infinite,fadein .8s ease .4s both
+}
+@keyframes pisca{50%{opacity:.35}}
 
-  /* Error state */
-  .erro-box{
-    background:rgba(0,0,0,.35);border:1.5px solid rgba(255,158,199,.2);
-    border-radius:18px;padding:32px 28px;text-align:center;backdrop-filter:blur(10px)
-  }
-  .erro-box .erro-icon{font-size:48px;margin-bottom:12px}
-  .erro-box h2{font-family:"Playfair Display",serif;font-size:22px;margin:0 0 10px;color:#fff}
-  .erro-box p{color:var(--rosa);font-size:15px;margin:0 0 18px;line-height:1.5}
-  .erro-box .erro-dica{
-    display:inline-block;background:rgba(233,185,73,.15);border:1px solid rgba(233,185,73,.3);
-    border-radius:10px;padding:10px 16px;font-size:13px;color:var(--ouro);line-height:1.5
-  }
+@keyframes fadein{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 
-  /* Petals */
-  .petala{position:fixed;bottom:-40px;z-index:1;pointer-events:none;animation:cai 4s ease-in forwards}
-  @keyframes cai{to{transform:translateY(-115vh) rotate(40deg);opacity:0}}
-  @keyframes sobe{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+/* ══════════════════════════════════════════════════
+   CENA 2: CARTA (overlay full-screen)
+   FIX: carta é um overlay fixo, não dentro do envelope
+══════════════════════════════════════════════════ */
+#letter-overlay{
+  position:fixed;inset:0;z-index:50;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+  overflow-y:auto;padding:24px 16px 40px;
+  background:linear-gradient(170deg,#0d0d1a 0%,#200d38 50%,#0d0d1a 100%);
+  opacity:0;pointer-events:none;
+  transition:opacity .45s ease .3s
+}
+#letter-overlay.visivel{opacity:1;pointer-events:auto}
 
-  @media (prefers-reduced-motion:reduce){
-    *{animation:none!important;transition:none!important}
-    .carta{opacity:1;transform:none}
-    .aba-cima{transform:rotateX(180deg)}
-    body{animation:none!important}
-  }
+/* Carta (papel de carta) */
+.carta-papel{
+  width:100%;max-width:480px;
+  background:linear-gradient(150deg,var(--papel),var(--papel2),var(--papel));
+  border-radius:22px;padding:38px 34px;position:relative;
+  box-shadow:0 24px 70px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.5);
+  transform:translateY(50px);
+  transition:transform .75s cubic-bezier(.2,.8,.2,1) .4s;
+  overflow:hidden
+}
+#letter-overlay.visivel .carta-papel{transform:translateY(0)}
+
+/* Linhas de papel pautado */
+.carta-papel::before{
+  content:'';position:absolute;inset:0;border-radius:22px;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent 0,transparent 27px,rgba(100,80,50,.09) 27px,rgba(100,80,50,.09) 28px)
+}
+/* Watermark */
+.carta-papel::after{
+  content:'💌';position:absolute;right:18px;bottom:16px;
+  font-size:58px;opacity:.06;pointer-events:none;line-height:1
+}
+
+.carta-badge{
+  font-size:10px;letter-spacing:3px;text-transform:uppercase;
+  color:var(--selo);opacity:.7;margin-bottom:18px;display:block
+}
+.carta-para{font-size:13px;color:var(--tinta2);margin-bottom:8px}
+.carta-mensagem{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(1.05rem,3.5vw,1.3rem);
+  line-height:1.7;color:var(--tinta);font-style:italic;margin-bottom:24px
+}
+.carta-mensagem::before{content:'\201C'}
+.carta-mensagem::after{content:'\201D'}
+.carta-de{
+  font-family:'Caveat',cursive;font-size:1.65rem;color:var(--selo);
+  text-align:right;display:flex;align-items:center;justify-content:flex-end;gap:8px
+}
+.heart{display:inline-block;animation:heartbeat 1.1s ease-in-out infinite}
+@keyframes heartbeat{0%,100%{transform:scale(1)}50%{transform:scale(1.28)}}
+
+/* Seção de compartilhar */
+.share-section{
+  width:100%;max-width:480px;margin-top:22px;
+  display:flex;flex-direction:column;align-items:center;gap:14px;
+  transform:translateY(20px);opacity:0;
+  transition:transform .5s ease .9s,opacity .5s ease .9s
+}
+#letter-overlay.visivel .share-section{transform:translateY(0);opacity:1}
+
+.share-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.btn-s{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:13px 24px;border-radius:30px;border:none;cursor:pointer;
+  font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;letter-spacing:.3px;
+  text-decoration:none;transition:transform .15s,filter .15s
+}
+.btn-s:hover{transform:translateY(-2px);filter:brightness(1.12)}
+.btn-s:active{transform:scale(.97)}
+.btn-wpp{background:#25D366;color:#fff}
+.btn-cpy{
+  background:rgba(255,255,255,.1);color:#fff;
+  border:1.5px solid rgba(255,255,255,.25);backdrop-filter:blur(8px)
+}
+.btn-cpy.copiado{background:rgba(76,175,80,.25);border-color:#4caf50}
+.share-hint{font-size:12px;color:var(--gold);opacity:.75;letter-spacing:.5px}
+
+/* Rodapé */
+.overlay-footer{
+  margin-top:22px;text-align:center;
+  font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);opacity:.6
+}
+.overlay-footer a{
+  color:var(--gold);opacity:.7;text-decoration:none;display:block;
+  margin-top:8px;font-size:11px;letter-spacing:1.5px
+}
+.overlay-footer a:hover{opacity:1;text-decoration:underline}
+
+/* ── Erro ── */
+.erro-box{
+  background:rgba(255,255,255,.04);border:1.5px solid rgba(255,107,157,.2);
+  border-radius:22px;padding:40px 30px;text-align:center;
+  backdrop-filter:blur(12px);max-width:380px;
+  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+  z-index:20;animation:fadein .6s ease
+}
+.erro-icon{font-size:52px;margin-bottom:16px}
+.erro-box h2{font-family:'Playfair Display',serif;font-size:1.45rem;color:#fff;margin-bottom:12px}
+.erro-box p{color:var(--muted);font-size:.9rem;line-height:1.6;margin-bottom:18px}
+.erro-dica{
+  display:inline-block;background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.25);
+  border-radius:12px;padding:12px 18px;font-size:13px;color:var(--gold);line-height:1.5
+}
+
+/* Pétalas */
+.petala{position:fixed;pointer-events:none;z-index:80;top:-40px;animation:petalacai linear forwards}
+@keyframes petalacai{to{transform:translateY(115vh) rotate(400deg) translateX(40px);opacity:0}}
 </style>
-</head><body>
+</head>
+<body>
 
+<div class="bg-anim"></div>
+<div class="particles" id="particles"></div>
 <canvas id="confetti-canvas"></canvas>
-<div class="vaga" aria-hidden="true"></div>
 
-<div class="palco">
-  <div class="chamada">
-    <div class="selo-cima">Arraiá TI · Correio Elegante</div>
+<!-- CENA 1: ENVELOPE SELADO -->
+<div id="scene-envelope">
+  <div class="badge-arraia">Arraiá TI · Correio Elegante</div>
+  <div class="titulo-env">
     <h1 id="titulo">Você recebeu um correio 💌</h1>
     <p id="subtitulo">Alguém pensou em você na festa…</p>
   </div>
-  <div class="cena" id="cena">
-    <div class="envelope" id="envelope" role="button" tabindex="0" aria-label="Abrir correio">
-      <div class="corpo"></div>
-      <div class="aba-lado"></div>
-      <div class="aba-baixo"></div>
-      <div class="carta">
-        <div class="selo-titulo">Correio Elegante</div>
-        <div class="para" id="c-para">Para você</div>
-        <div class="msg" id="c-msg">…</div>
-        <div class="de" id="c-de">
-          <span id="de-texto">— Anônimo</span>
-          <span class="de-heart" id="de-heart" aria-hidden="true">❤️</span>
-        </div>
-      </div>
-      <div class="aba-cima"></div>
-      <div class="selo">TI</div>
+  <div class="env-wrap" id="env-wrap" role="button" tabindex="0" aria-label="Abrir envelope">
+    <div class="envelope-3d">
+      <div class="env-corpo"></div>
+      <div class="env-lv"></div>
+      <div class="env-lh"></div>
+      <div class="env-flap"></div>
+      <div class="env-seal">💌</div>
     </div>
   </div>
-  <div class="toque" id="toque">toque no envelope para abrir</div>
-  <div class="acoes" id="acoes">
-    <div class="acoes-row">
-      <a class="btn-share btn-whatsapp" id="btn-wpp" href="#" target="_blank" rel="noopener">💬 Compartilhar no WhatsApp</a>
-      <button class="btn-share btn-copy" id="btn-copy">📋 Copiar mensagem</button>
+  <div class="env-hint">toque no envelope para abrir ✨</div>
+</div>
+
+<!-- CENA 2: CARTA (overlay fixo — sem posicionamento dentro do envelope) -->
+<div id="letter-overlay">
+  <div class="carta-papel">
+    <span class="carta-badge">Correio Elegante · Arraiá TI</span>
+    <div class="carta-para" id="c-para">Para você</div>
+    <div class="carta-mensagem" id="c-msg">…</div>
+    <div class="carta-de">
+      <span id="c-de">— Anônimo</span>
+      <span class="heart" aria-hidden="true">❤️</span>
     </div>
-    <div class="acoes-hint">📸 tire um print pra guardar de recordação</div>
   </div>
-  <div class="rodape">
+
+  <div class="share-section">
+    <div class="share-row">
+      <a class="btn-s btn-wpp" id="btn-wpp" href="#" target="_blank" rel="noopener">💬 WhatsApp</a>
+      <button class="btn-s btn-cpy" id="btn-cpy">📋 Copiar mensagem</button>
+    </div>
+    <div class="share-hint">📸 tire um print pra guardar de recordação!</div>
+  </div>
+
+  <div class="overlay-footer">
     Festa Junina · Turma de TI
-    <a href="https://t.me/arraia_correio_bot" target="_blank" rel="noopener">✉️ Ativar meu correio no Telegram</a>
+    <a href="https://t.me/arraia_correio_bot" target="_blank" rel="noopener">
+      ✉️ Ativar meu correio no Telegram
+    </a>
   </div>
 </div>
 
 <script>
 (function(){
-  /* ── Sparkles ── */
-  const vaga = document.querySelector(".vaga");
-  for (let i = 0; i < 20; i++) {
-    const f = document.createElement("i");
-    f.style.left = Math.random() * 100 + "%";
-    f.style.bottom = (-10 + Math.random() * 30) + "%";
-    f.style.animationDuration = (6 + Math.random() * 7) + "s";
-    f.style.animationDelay = (Math.random() * 7) + "s";
-    vaga.appendChild(f);
-  }
+'use strict';
 
-  /* ── State ── */
-  let mensagemTexto = "";
-  let paraTexto = "";
-  let deTexto = "";
+/* ── Partículas ── */
+const pc = document.getElementById('particles');
+for(let i=0;i<28;i++){
+  const d=document.createElement('div');
+  d.className='p';
+  d.style.left=Math.random()*100+'%';
+  d.style.bottom=(-5+Math.random()*15)+'%';
+  d.style.animationDuration=(7+Math.random()*9)+'s';
+  d.style.animationDelay=Math.random()*8+'s';
+  const s=3+Math.random()*5;
+  d.style.width=d.style.height=s+'px';
+  pc.appendChild(d);
+}
 
-  /* ── Fetch data ── */
-  const codigo = location.pathname.split("/").filter(Boolean).pop();
-  fetch("/api/correios/" + codigo)
-    .then(r => { if (!r.ok) throw r.status; return r.json(); })
-    .then(d => {
-      const anon = d.anonimo;
-      paraTexto = d.para || "você";
-      mensagemTexto = d.mensagem || "";
-      deTexto = d.de || "Anônimo";
+/* ── Estado ── */
+let paraTexto='',mensagemTexto='',deTexto='';
 
-      document.getElementById("c-para").textContent = "Para " + paraTexto;
-      document.getElementById("c-msg").textContent = "“" + mensagemTexto + "”";
-      document.getElementById("de-texto").textContent = "— " + deTexto;
-      document.getElementById("subtitulo").textContent =
-        anon ? "Alguém pensou em você na festa…" : deTexto + " mandou um correio pra você";
+/* ── Buscar correio ── */
+const codigo=location.pathname.split('/').filter(Boolean).pop();
+fetch('/api/correios/'+codigo)
+  .then(r=>{if(!r.ok)throw r.status;return r.json();})
+  .then(d=>{
+    paraTexto=d.para||'você';
+    mensagemTexto=d.mensagem||'';
+    deTexto=d.de||'Anônimo';
 
-      /* WhatsApp link */
-      const shareText = "Recebi um correio elegante no Arraiá TI! 💌\n\n"Para " + paraTexto + "" — " + deTexto + "\n\n"" + mensagemTexto + ""\n\n✨ Arraiá TI · Correio Elegante";
-      document.getElementById("btn-wpp").href = "https://wa.me/?text=" + encodeURIComponent(shareText);
-    })
-    .catch(status => {
-      document.getElementById("cena").innerHTML = `
-        <div class="erro-box">
-          <div class="erro-icon">🙈</div>
-          <h2>Correio não encontrado</h2>
-          <p>Esse código não existe ou já foi removido.<br>Tente novamente com o código da barraca.</p>
-          <div class="erro-dica">💡 Confira o QR Code ou o link recebido<br>e certifique-se de digitá-lo corretamente.</div>
-        </div>`;
-      document.getElementById("toque").style.display = "none";
-      document.getElementById("acoes").style.display = "none";
-      document.getElementById("titulo").textContent = "Hmm…";
-      document.getElementById("subtitulo").textContent = "";
-    });
+    document.getElementById('c-para').textContent='Para '+paraTexto;
+    document.getElementById('c-msg').textContent=mensagemTexto;
+    document.getElementById('c-de').textContent='— '+deTexto;
+    document.getElementById('titulo').textContent='Você recebeu um correio 💌';
+    document.getElementById('subtitulo').textContent=d.anonimo
+      ?'Alguém pensou em você na festa…'
+      :deTexto+' mandou um correio pra você';
 
-  /* ── Web Audio chime ── */
-  function tocarChime() {
-    try {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      const notes = [523.25, 659.25, 783.99]; /* C5, E5, G5 */
-      notes.forEach((freq, i) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = "sine";
-        osc.frequency.value = freq;
-        gain.gain.setValueAtTime(0, ctx.currentTime + i * 0.18);
-        gain.gain.linearRampToValueAtTime(0.28, ctx.currentTime + i * 0.18 + 0.04);
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.18 + 0.7);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(ctx.currentTime + i * 0.18);
-        osc.stop(ctx.currentTime + i * 0.18 + 0.8);
-      });
-    } catch(e) { /* audio not available, silently skip */ }
-  }
-
-  /* ── Canvas confetti ── */
-  function dispararConfetti() {
-    const canvas = document.getElementById("confetti-canvas");
-    canvas.style.display = "block";
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    const ctx = canvas.getContext("2d");
-    const CORES = ["#e9b949","#ff9ec7","#c2402f","#4caf50","#2196f3","#ffffff","#ff5722","#9c27b0"];
-    const particles = [];
-    for (let i = 0; i < 150; i++) {
-      particles.push({
-        x: Math.random() * canvas.width,
-        y: -10 - Math.random() * 200,
-        w: 7 + Math.random() * 8,
-        h: 4 + Math.random() * 5,
-        cor: CORES[Math.floor(Math.random() * CORES.length)],
-        rot: Math.random() * Math.PI * 2,
-        vx: -2 + Math.random() * 4,
-        vy: 2.5 + Math.random() * 3.5,
-        vrot: (-1 + Math.random() * 2) * 0.1,
-        alpha: 1
-      });
-    }
-    const start = performance.now();
-    const DURACAO = 4000;
-    function tick(now) {
-      const elapsed = now - start;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const fade = Math.max(0, 1 - (elapsed - DURACAO * 0.6) / (DURACAO * 0.4));
-      particles.forEach(p => {
-        p.x += p.vx;
-        p.y += p.vy;
-        p.rot += p.vrot;
-        p.vy += 0.04; /* gravity */
-        ctx.save();
-        ctx.translate(p.x, p.y);
-        ctx.rotate(p.rot);
-        ctx.globalAlpha = (elapsed > DURACAO * 0.6 ? fade : 1);
-        ctx.fillStyle = p.cor;
-        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
-        ctx.restore();
-      });
-      if (elapsed < DURACAO) {
-        requestAnimationFrame(tick);
-      } else {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        canvas.style.display = "none";
-      }
-    }
-    requestAnimationFrame(tick);
-  }
-
-  /* ── Petals ── */
-  function petalas() {
-    for (let i = 0; i < 18; i++) {
-      const p = document.createElement("span");
-      p.className = "petala";
-      p.textContent = ["❤️","💕","🌸","💖","🌼"][i % 5];
-      p.style.left = (Math.random() * 100) + "%";
-      p.style.fontSize = (16 + Math.random() * 22) + "px";
-      p.style.animationDelay = (Math.random() * 0.8) + "s";
-      p.style.animationDuration = (3.2 + Math.random() * 1.8) + "s";
-      document.body.appendChild(p);
-      setTimeout(() => p.remove(), 5200);
-    }
-  }
-
-  /* ── Open envelope ── */
-  const env = document.getElementById("envelope");
-  let aberto = false;
-  function abrir() {
-    if (aberto) return;
-    aberto = true;
-    tocarChime();
-    document.querySelector(".palco").classList.add("aberto");
-    petalas();
-    dispararConfetti();
-  }
-  env.addEventListener("click", abrir);
-  env.addEventListener("keydown", e => {
-    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); abrir(); }
+    const txt='Recebi um correio elegante no Arraiá TI! 💌\n\n"Para '+paraTexto+'" — '+deTexto+'\n\n"'+mensagemTexto+'"\n\n✨ Arraiá TI · Correio Elegante';
+    document.getElementById('btn-wpp').href='https://wa.me/?text='+encodeURIComponent(txt);
+  })
+  .catch(()=>{
+    document.getElementById('scene-envelope').style.display='none';
+    const err=document.createElement('div');
+    err.className='erro-box';
+    err.innerHTML='<div class="erro-icon">🙈</div><h2>Correio não encontrado</h2><p>Esse código não existe ou foi removido pela moderação.<br>Verifique o link ou QR Code recebido.</p><div class="erro-dica">💡 Confira se o link está correto e tente novamente.</div>';
+    document.body.appendChild(err);
   });
 
-  /* ── Copy button ── */
-  document.getElementById("btn-copy").addEventListener("click", function() {
-    const txt = ""Para " + paraTexto + "" — " + deTexto + "\n\n"" + mensagemTexto + ""\n\n— Arraiá TI · Correio Elegante";
-    navigator.clipboard.writeText(txt).then(() => {
-      const btn = this;
-      const orig = btn.textContent;
-      btn.textContent = "✅ Copiado!";
-      btn.style.background = "rgba(76,175,80,.35)";
-      btn.style.borderColor = "#4caf50";
-      setTimeout(() => {
-        btn.textContent = orig;
-        btn.style.background = "";
-        btn.style.borderColor = "";
-      }, 2000);
-    }).catch(() => {
-      /* Fallback for browsers that don't support clipboard API */
-      const ta = document.createElement("textarea");
-      ta.value = txt;
-      ta.style.position = "fixed";
-      ta.style.opacity = "0";
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand("copy");
-      ta.remove();
-      const btn = this;
-      const orig = btn.textContent;
-      btn.textContent = "✅ Copiado!";
-      setTimeout(() => { btn.textContent = orig; }, 2000);
+/* ── Chime ── */
+function tocarChime(){
+  try{
+    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    [[523.25,0],[659.25,.18],[783.99,.36]].forEach(([f,d])=>{
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.type='sine';o.frequency.value=f;
+      g.gain.setValueAtTime(0,ctx.currentTime+d);
+      g.gain.linearRampToValueAtTime(.3,ctx.currentTime+d+.04);
+      g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+d+.85);
+      o.connect(g);g.connect(ctx.destination);
+      o.start(ctx.currentTime+d);o.stop(ctx.currentTime+d+1);
     });
-  });
+  }catch(e){}
+}
+
+/* ── Confetti ── */
+function confetti(){
+  const cv=document.getElementById('confetti-canvas');
+  cv.style.display='block';
+  cv.width=window.innerWidth;cv.height=window.innerHeight;
+  const c=cv.getContext('2d');
+  const CORES=['#ff6b9d','#ffd700','#c44dff','#00e5ff','#4caf50','#fff','#ff5722','#ff9800'];
+  const ps=Array.from({length:180},()=>({
+    x:Math.random()*cv.width,y:-20-Math.random()*200,
+    w:7+Math.random()*9,h:4+Math.random()*5,
+    cor:CORES[Math.floor(Math.random()*CORES.length)],
+    rot:Math.random()*Math.PI*2,
+    vx:-2.5+Math.random()*5,vy:2.5+Math.random()*3.5,
+    vrot:(-1+Math.random()*2)*.12
+  }));
+  const t0=performance.now(),DUR=4800;
+  const tick=t=>{
+    const el=t-t0;
+    c.clearRect(0,0,cv.width,cv.height);
+    const fade=el>DUR*.65?Math.max(0,1-(el-DUR*.65)/(DUR*.35)):1;
+    ps.forEach(p=>{
+      p.x+=p.vx;p.y+=p.vy;p.rot+=p.vrot;p.vy+=.045;
+      c.save();c.translate(p.x,p.y);c.rotate(p.rot);
+      c.globalAlpha=fade;c.fillStyle=p.cor;
+      c.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+      c.restore();
+    });
+    if(el<DUR)requestAnimationFrame(tick);
+    else{c.clearRect(0,0,cv.width,cv.height);cv.style.display='none';}
+  };
+  requestAnimationFrame(tick);
+}
+
+/* ── Pétalas ── */
+function petals(){
+  const em=['❤️','💕','🌸','💖','🌼','🎉','💫','🌺'];
+  for(let i=0;i<22;i++){
+    const el=document.createElement('span');
+    el.className='petala';
+    el.textContent=em[i%em.length];
+    el.style.left=Math.random()*100+'%';
+    el.style.fontSize=(16+Math.random()*22)+'px';
+    el.style.animationDelay=Math.random()*.8+'s';
+    el.style.animationDuration=(3+Math.random()*2)+'s';
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(),5800);
+  }
+}
+
+/* ── Abrir envelope ──
+   FIX: o overlay (#letter-overlay) é separado do envelope no DOM.
+   Não há posicionamento absoluto dentro do envelope.
+   Garantido que o clique sempre funciona. ── */
+let aberto=false;
+function abrir(){
+  if(aberto)return;
+  aberto=true;
+  tocarChime();
+
+  const wrap=document.getElementById('env-wrap');
+  const scene=document.getElementById('scene-envelope');
+  const overlay=document.getElementById('letter-overlay');
+
+  wrap.classList.add('abrindo');
+
+  setTimeout(()=>scene.classList.add('saindo'),350);
+  setTimeout(()=>{
+    scene.style.display='none';
+    overlay.classList.add('visivel');
+    petals();
+    confetti();
+  },800);
+}
+
+const wrap=document.getElementById('env-wrap');
+wrap.addEventListener('click',abrir);
+wrap.addEventListener('keydown',e=>{
+  if(e.key==='Enter'||e.key===' '){e.preventDefault();abrir();}
+});
+
+/* ── Copiar ── */
+document.getElementById('btn-cpy').addEventListener('click',function(){
+  const txt='"Para '+paraTexto+'" — '+deTexto+'\n\n"'+mensagemTexto+'"\n\n— Arraiá TI · Correio Elegante';
+  const btn=this;
+  const ok=()=>{
+    btn.textContent='✅ Copiado!';btn.classList.add('copiado');
+    setTimeout(()=>{btn.textContent='📋 Copiar mensagem';btn.classList.remove('copiado');},2200);
+  };
+  if(navigator.clipboard){navigator.clipboard.writeText(txt).then(ok).catch(()=>fb(txt,ok));}
+  else{fb(txt,ok);}
+  function fb(t,cb){
+    const ta=document.createElement('textarea');ta.value=t;
+    ta.style.cssText='position:fixed;opacity:0;top:0;left:0';
+    document.body.appendChild(ta);ta.select();
+    try{document.execCommand('copy');cb();}catch(e){}
+    ta.remove();
+  }
+});
+
 })();
 </script>
 </body></html>

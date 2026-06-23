@@ -1,199 +1,770 @@
-<!doctype html><html lang="pt-br"><head>
+<!doctype html>
+<html lang="pt-br">
+<head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="manifest" href="/static/manifest.json" />
 <title>Barraca · Correio Elegante</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Rye&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Outfit:wght@300;400;500;600;700;800&family=Caveat:wght@400;600;700&display=swap" rel="stylesheet" />
 <style>
-  :root{
-    --noite:#15173a;--kraft:#f3e7cf;--fogueira:#ff7a2d;--brasa:#ff3d3d;
-    --milho:#ffc83d;--verde:#3ec46d;--azul:#43b3ff;--rosa:#ff6fae;
-    --tinta:#23224a;--tinta-2:#52527a;--linha:rgba(35,34,74,.12)
-  }
-  *{box-sizing:border-box}
-  html,body{margin:0}
-  body{
-    font-family:"Outfit",system-ui,sans-serif;color:var(--tinta);min-height:100vh;
-    background:radial-gradient(1200px 500px at 80% -10%,#2a2c66 0,transparent 60%),var(--noite);
-    padding:20px 16px 40px
-  }
+:root {
+  --pink:    #ff6b9d;
+  --gold:    #ffd700;
+  --teal:    #00e5ff;
+  --purple:  #c44dff;
+  --text:    #f0f0f8;
+  --muted:   #8888aa;
+  --bg-base: #0d0d1a;
+  --card-bg: rgba(255,255,255,0.04);
+  --card-border: rgba(255,255,255,0.1);
+  --input-bg: rgba(255,255,255,0.07);
+  --hero:    linear-gradient(135deg, #ff6b9d, #c44dff, #00e5ff);
+}
 
-  /* Bandeirinhas */
-  .bandeirinhas{height:22px;display:flex;overflow:hidden;border-radius:6px;margin-bottom:18px}
-  .bandeirinhas i{flex:1 0 22px;height:22px;clip-path:polygon(0 0,100% 0,50% 100%)}
-  .bandeirinhas i:nth-child(5n+1){background:var(--brasa)}
-  .bandeirinhas i:nth-child(5n+2){background:var(--milho)}
-  .bandeirinhas i:nth-child(5n+3){background:var(--verde)}
-  .bandeirinhas i:nth-child(5n+4){background:var(--azul)}
-  .bandeirinhas i:nth-child(5n+5){background:var(--rosa)}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  .wrap{max-width:480px;margin:0 auto}
+html, body {
+  min-height: 100vh;
+  font-family: 'Outfit', system-ui, sans-serif;
+  color: var(--text);
+  background: var(--bg-base);
+  overflow-x: hidden;
+}
 
-  h1{
-    font-family:"Rye",serif;color:var(--milho);font-weight:400;font-size:28px;
-    text-align:center;margin:0 0 4px;text-shadow:0 2px 0 #b8431b
-  }
-  .sub{text-align:center;color:var(--kraft);opacity:.7;font-size:14px;margin-bottom:20px}
+body {
+  background:
+    radial-gradient(ellipse 900px 600px at 15% 20%, rgba(196,77,255,0.18) 0%, transparent 70%),
+    radial-gradient(ellipse 700px 500px at 85% 70%, rgba(255,107,157,0.15) 0%, transparent 65%),
+    radial-gradient(ellipse 500px 400px at 50% 50%, rgba(0,229,255,0.06) 0%, transparent 60%),
+    #0d0d1a;
+  padding: 0 0 60px;
+}
 
-  /* Card principal */
-  .cartao{
-    background:var(--kraft);border-radius:18px;padding:22px 20px;
-    box-shadow:0 10px 30px rgba(21,23,58,.22);position:relative;overflow:hidden
-  }
-  .cartao::before{
-    content:"";position:absolute;inset:0 0 auto 0;height:5px;
-    background:linear-gradient(90deg,var(--brasa),var(--milho),var(--verde),var(--azul),var(--rosa))
-  }
+/* ── Particles canvas ── */
+#particles-canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+}
 
-  label{display:block;font-weight:600;font-size:13px;margin:14px 0 6px}
+#confetti-canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  width: 100%;
+  height: 100%;
+}
 
-  /* Inputs com micro-animação de foco */
-  input,textarea{
-    width:100%;font:inherit;font-size:16px;padding:12px 13px;border-radius:11px;
-    border:1.5px solid var(--linha);background:#fff;color:var(--tinta);
-    transition:border-color .2s,box-shadow .2s,transform .15s
-  }
-  input:focus,textarea:focus{
-    outline:none;border-color:var(--fogueira);
-    box-shadow:0 0 0 4px rgba(255,122,45,.18);
-    transform:translateY(-1px)
-  }
-  textarea{resize:vertical;min-height:100px}
+/* ── Layout ── */
+.wrap {
+  position: relative;
+  z-index: 1;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
 
-  /* Para field row com badge */
-  .para-row{position:relative}
-  .badge-tg{
-    display:none;align-items:center;gap:5px;margin-top:6px;
-    font-size:12px;font-weight:700;color:#1d6fd1;
-    background:#d6ecff;padding:3px 10px;border-radius:999px;
-    width:fit-content
-  }
-  .badge-tg.show{display:flex}
+/* ── Bandeirinhas ── */
+.bandeiras-wrap {
+  position: relative;
+  width: 100vw;
+  left: 50%;
+  transform: translateX(-50%);
+  overflow: hidden;
+  height: 52px;
+  margin-bottom: 32px;
+}
 
-  /* Templates de mensagem */
-  .templates{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px}
-  .chip{
-    font:inherit;font-size:12px;font-weight:600;cursor:pointer;
-    padding:6px 12px;border-radius:999px;border:1.5px solid rgba(255,122,45,.35);
-    background:rgba(255,122,45,.07);color:var(--tinta);
-    transition:background .15s,border-color .15s,transform .1s;white-space:nowrap
-  }
-  .chip:hover{background:rgba(255,122,45,.18);border-color:var(--fogueira);transform:translateY(-1px)}
-  .chip:active{transform:translateY(0)}
+.fio {
+  position: absolute;
+  top: 10px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(255,215,0,0.5), rgba(255,215,0,0.8), rgba(255,215,0,0.5), transparent);
+}
 
-  /* Emojis rápidos */
-  .emoji-row{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px}
-  .emoji-btn{
-    font-size:20px;background:none;border:1.5px solid transparent;border-radius:8px;
-    padding:3px 5px;cursor:pointer;transition:background .12s,border-color .12s,transform .1s;
-    line-height:1
-  }
-  .emoji-btn:hover{background:rgba(255,122,45,.12);border-color:rgba(255,122,45,.3);transform:scale(1.2)}
-  .emoji-btn:active{transform:scale(1)}
+.bandeiras {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0;
+  padding: 0 20px;
+  flex-wrap: nowrap;
+  width: 100%;
+}
 
-  /* Contador de caracteres */
-  .msg-meta{display:flex;justify-content:space-between;align-items:center;margin-top:4px}
-  .char-count{font-size:11px;font-weight:600;color:var(--tinta-2);transition:color .2s}
-  .char-count.quase{color:var(--fogueira)}
-  .char-count.cheio{color:var(--brasa)}
+.flag {
+  display: block;
+  width: 32px;
+  height: 40px;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  flex-shrink: 0;
+  animation: flagSwing 2s ease-in-out infinite alternate;
+  transform-origin: top center;
+}
 
-  .linha-anon{display:flex;align-items:center;gap:10px;margin-top:16px;font-weight:600;font-size:14px}
-  .linha-anon input{width:auto}
+.flag:nth-child(5n+1) { background: var(--pink); animation-delay: 0s; }
+.flag:nth-child(5n+2) { background: var(--gold); animation-delay: 0.2s; }
+.flag:nth-child(5n+3) { background: #22c55e; animation-delay: 0.4s; }
+.flag:nth-child(5n+4) { background: var(--teal); animation-delay: 0.6s; }
+.flag:nth-child(5n+5) { background: #ef4444; animation-delay: 0.8s; }
 
-  /* Botão com hover lift */
-  .botao{
-    margin-top:18px;width:100%;border:0;cursor:pointer;font:inherit;font-weight:800;
-    font-size:17px;color:#fff;padding:15px;border-radius:13px;
-    background:linear-gradient(180deg,var(--rosa),#e2528d);
-    box-shadow:0 8px 18px rgba(226,82,141,.35);
-    transition:transform .15s,box-shadow .15s
-  }
-  .botao:hover{transform:translateY(-2px);box-shadow:0 12px 24px rgba(226,82,141,.45)}
-  .botao:active{transform:translateY(1px);box-shadow:0 4px 10px rgba(226,82,141,.3)}
-  .botao:disabled{opacity:.65;cursor:not-allowed;transform:none}
+@keyframes flagSwing {
+  from { transform: rotate(-4deg); }
+  to   { transform: rotate(4deg); }
+}
 
-  .dica{color:var(--tinta-2);font-size:12px;margin:8px 2px 0;line-height:1.5}
+/* ── Header ── */
+.header {
+  text-align: center;
+  margin-bottom: 28px;
+  animation: fadeDown 0.7s cubic-bezier(.22,1,.36,1) both;
+}
 
-  /* Resultado */
-  #resultado{display:none;text-align:center;margin-top:4px}
-  #resultado .cod{font-family:"Rye",serif;color:var(--brasa);font-size:36px}
-  #resultado .via{
-    display:inline-block;margin:8px 0;padding:6px 14px;
-    border-radius:999px;font-weight:800;font-size:13px
-  }
-  .via.tg{background:#d6ecff;color:#1d6fd1}
-  .via.lk{background:#fff0cf;color:#9a6b00}
-  .via.mod{background:#ffd9d9;color:#c23a0e}
-  #qr{display:flex;justify-content:center;margin:12px 0}
-  #qr canvas,#qr img{background:#fff;padding:10px;border-radius:12px}
-  #resultado a.link{display:block;color:var(--tinta-2);font-size:11px;word-break:break-all;margin-top:6px}
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 
-  /* Botões de ação do resultado */
-  .resultado-acoes{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
-  .resultado-acoes button{
-    flex:1;min-width:120px;font:inherit;font-size:13px;font-weight:700;cursor:pointer;
-    padding:10px 8px;border-radius:11px;border:1.5px solid var(--linha);
-    background:#fff;color:var(--tinta);transition:transform .12s,box-shadow .12s
-  }
-  .resultado-acoes button:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.1)}
-  .novo{
-    margin-top:10px;background:#fff;border:1.5px solid var(--linha);
-    border-radius:11px;padding:11px;font:inherit;font-weight:700;cursor:pointer;width:100%;
-    transition:transform .12s,box-shadow .12s
-  }
-  .novo:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(30px, 7vw, 42px);
+  font-weight: 700;
+  background: var(--hero);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+  filter: drop-shadow(0 0 30px rgba(196,77,255,0.4));
+}
 
-  /* Animação do resultado (slide up) */
-  @keyframes slideUp{
-    from{opacity:0;transform:translateY(16px)}
-    to{opacity:1;transform:translateY(0)}
-  }
-  .slide-up{animation:slideUp .35s cubic-bezier(.22,1,.36,1)}
+.header .subtitle {
+  font-family: 'Caveat', cursive;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--gold);
+  margin-top: 6px;
+  letter-spacing: 1px;
+  opacity: 0.9;
+}
 
-  /* Confetti canvas */
-  #confetti-canvas{
-    position:fixed;inset:0;pointer-events:none;z-index:9999;width:100%;height:100%
-  }
+/* ── Glassmorphism Card ── */
+.card {
+  background: var(--card-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--card-border);
+  border-radius: 24px;
+  padding: 28px 24px;
+  position: relative;
+  overflow: hidden;
+  animation: fadeUp 0.7s cubic-bezier(.22,1,.36,1) 0.15s both;
+}
 
-  /* Mobile */
-  @media(max-width:480px){
-    body{padding:14px 10px 30px}
-    .cartao{padding:18px 14px}
-    h1{font-size:24px}
-    input,textarea{font-size:17px;padding:13px 12px}
-    .botao{font-size:16px;padding:16px}
-    .emoji-btn{font-size:22px;padding:5px 6px}
-    .chip{font-size:13px;padding:8px 13px}
-    .resultado-acoes{flex-direction:column}
-    .resultado-acoes button{min-width:unset}
-  }
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(255,107,157,0.4), rgba(196,77,255,0.3), rgba(0,229,255,0.2));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Form labels ── */
+.field { margin-bottom: 4px; }
+
+label {
+  display: block;
+  font-family: 'Playfair Display', serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 8px;
+  margin-top: 18px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  font-size: 11px;
+}
+
+label:first-of-type { margin-top: 0; }
+
+label .label-accent {
+  color: var(--pink);
+}
+
+label small {
+  font-family: 'Outfit', sans-serif;
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 400;
+}
+
+/* ── Inputs ── */
+input[type="text"],
+input[type="email"],
+input:not([type="checkbox"]):not([type="button"]):not([type="submit"]),
+textarea {
+  width: 100%;
+  font-family: 'Outfit', sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--text);
+  background: var(--input-bg);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 13px 15px;
+  outline: none;
+  transition: border-color 0.25s, box-shadow 0.25s, background 0.25s, transform 0.15s;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+input:focus,
+textarea:focus {
+  border-color: var(--pink);
+  box-shadow: 0 0 0 3px rgba(255,107,157,0.18), 0 0 20px rgba(255,107,157,0.08);
+  background: rgba(255,255,255,0.09);
+  transform: translateY(-1px);
+}
+
+input:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+input::placeholder, textarea::placeholder {
+  color: rgba(136,136,170,0.6);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 108px;
+  line-height: 1.6;
+}
+
+/* ── Para row badge ── */
+.para-row { position: relative; }
+
+.badge-tg {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--teal);
+  background: rgba(0,229,255,0.1);
+  border: 1px solid rgba(0,229,255,0.25);
+  padding: 4px 12px;
+  border-radius: 999px;
+  width: fit-content;
+  animation: popIn 0.25s cubic-bezier(.34,1.56,.64,1) both;
+}
+
+.badge-tg.show { display: flex; }
+
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.8); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ── Template chips ── */
+.section-label {
+  font-family: 'Outfit', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 10px;
+  margin-top: 20px;
+}
+
+.templates {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.chip {
+  font-family: 'Outfit', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(196,77,255,0.35);
+  background: rgba(196,77,255,0.08);
+  color: var(--text);
+  transition: background 0.2s, border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+}
+
+.chip::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--hero);
+  opacity: 0;
+  transition: opacity 0.2s;
+  border-radius: inherit;
+}
+
+.chip:hover {
+  border-color: var(--purple);
+  background: rgba(196,77,255,0.18);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(196,77,255,0.25);
+}
+
+.chip:active { transform: translateY(0); }
+
+/* ── Emoji row ── */
+.emoji-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.emoji-btn {
+  font-size: 22px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 10px;
+  padding: 5px 7px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+  line-height: 1;
+}
+
+.emoji-btn:hover {
+  background: rgba(255,107,157,0.15);
+  border-color: rgba(255,107,157,0.4);
+  transform: scale(1.25) translateY(-2px);
+  box-shadow: 0 4px 14px rgba(255,107,157,0.2);
+}
+
+.emoji-btn:active { transform: scale(1.05); }
+
+/* ── Char counter ── */
+.msg-meta {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 6px;
+}
+
+.char-count {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  transition: color 0.25s;
+}
+
+.char-count.quase { color: var(--gold); }
+.char-count.cheio { color: var(--pink); }
+
+/* ── Anon row ── */
+.anon-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.anon-row:hover {
+  background: rgba(255,107,157,0.06);
+  border-color: rgba(255,107,157,0.2);
+}
+
+.anon-row input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--pink);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.anon-row label {
+  margin: 0;
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  text-transform: none;
+  letter-spacing: 0;
+  cursor: pointer;
+}
+
+/* ── Send button ── */
+.btn-send {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 22px;
+  width: 100%;
+  border: none;
+  cursor: pointer;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 800;
+  font-size: 17px;
+  color: #fff;
+  padding: 17px 24px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ff6b9d, #c44dff, #00e5ff);
+  background-size: 200% 200%;
+  box-shadow: 0 8px 32px rgba(255,107,157,0.35), 0 2px 8px rgba(196,77,255,0.2);
+  transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+  position: relative;
+  overflow: hidden;
+  animation: gradientShift 4s ease infinite;
+}
+
+@keyframes gradientShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.btn-send:hover:not(:disabled) {
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: 0 16px 40px rgba(255,107,157,0.45), 0 4px 16px rgba(196,77,255,0.3);
+}
+
+.btn-send:active:not(:disabled) {
+  transform: translateY(1px) scale(0.99);
+  box-shadow: 0 4px 12px rgba(255,107,157,0.25);
+}
+
+.btn-send:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-send .spinner {
+  display: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+.btn-send.loading .spinner { display: block; }
+.btn-send.loading .btn-text { opacity: 0.7; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Hint text ── */
+.hint {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.hint strong { color: rgba(255,255,255,0.5); font-weight: 600; }
+
+/* ── Divider ── */
+.divider {
+  height: 1px;
+  background: rgba(255,255,255,0.07);
+  margin: 20px 0;
+}
+
+/* ═══════════════════════════════════════════
+   SUCCESS / RESULTADO STATE
+═══════════════════════════════════════════ */
+#resultado { display: none; text-align: center; }
+
+.success-header {
+  margin-bottom: 20px;
+}
+
+.success-icon {
+  font-size: 56px;
+  line-height: 1;
+  margin-bottom: 8px;
+  animation: bounceIn 0.5s cubic-bezier(.34,1.56,.64,1) both;
+}
+
+@keyframes bounceIn {
+  from { opacity: 0; transform: scale(0.4); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.success-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 700;
+  background: var(--hero);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.success-sub {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* Code display */
+.cod-wrap {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px;
+  padding: 16px;
+  margin: 16px 0;
+}
+
+.cod-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+
+.cod {
+  font-family: 'Playfair Display', serif;
+  font-size: 36px;
+  font-weight: 700;
+  background: var(--hero);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 2px;
+}
+
+/* Via badge */
+.via {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 10px auto;
+  padding: 7px 18px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.via.tg  { background: rgba(0,229,255,0.12); color: var(--teal);   border: 1px solid rgba(0,229,255,0.3); }
+.via.lk  { background: rgba(255,215,0,0.1);  color: var(--gold);   border: 1px solid rgba(255,215,0,0.3); }
+.via.mod { background: rgba(255,107,157,0.1); color: var(--pink);   border: 1px solid rgba(255,107,157,0.3); }
+
+/* QR Code */
+#qr {
+  display: flex;
+  justify-content: center;
+  margin: 16px 0 10px;
+}
+
+#qr canvas, #qr img {
+  background: #fff;
+  padding: 12px;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+
+.link-display {
+  font-size: 11px;
+  color: var(--muted);
+  word-break: break-all;
+  margin-top: 6px;
+  display: block;
+  text-decoration: none;
+}
+
+.link-display:hover { color: var(--teal); }
+
+/* Action buttons */
+.resultado-acoes {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+.btn-action {
+  flex: 1;
+  min-width: 130px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 11px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+  transition: transform 0.15s, box-shadow 0.15s, background 0.2s, border-color 0.2s;
+}
+
+.btn-action:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.2);
+}
+
+.btn-action:active { transform: translateY(0); }
+
+.btn-novo {
+  margin-top: 12px;
+  width: 100%;
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 13px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,107,157,0.3);
+  background: rgba(255,107,157,0.08);
+  color: var(--pink);
+  transition: transform 0.15s, box-shadow 0.15s, background 0.2s;
+}
+
+.btn-novo:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255,107,157,0.15);
+  background: rgba(255,107,157,0.14);
+}
+
+/* ── Slide-up animation ── */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.slide-up { animation: slideUp 0.4s cubic-bezier(.22,1,.36,1) both; }
+
+/* ── Nav links ── */
+.nav-links {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 32px;
+  animation: fadeUp 0.7s cubic-bezier(.22,1,.36,1) 0.4s both;
+}
+
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  text-decoration: none;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  transition: color 0.2s, background 0.2s, border-color 0.2s, transform 0.15s;
+}
+
+.nav-link:hover {
+  color: var(--text);
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.15);
+  transform: translateY(-2px);
+}
+
+/* ── Mobile ── */
+@media (max-width: 480px) {
+  .card { padding: 20px 16px; border-radius: 20px; }
+  .header h1 { font-size: 28px; }
+  .flag { width: 28px; height: 36px; }
+  input, textarea { font-size: 16px; }
+  .btn-send { font-size: 16px; padding: 16px; }
+  .emoji-btn { font-size: 24px; padding: 6px 8px; }
+  .chip { font-size: 12px; padding: 8px 14px; }
+  .resultado-acoes { flex-direction: column; }
+  .btn-action { min-width: unset; }
+}
 </style>
-</head><body>
+</head>
+<body>
+
+<canvas id="particles-canvas"></canvas>
 <canvas id="confetti-canvas"></canvas>
+
 <div class="wrap">
-  <div class="bandeirinhas" id="band"></div>
-  <h1>Correio Elegante</h1>
-  <div class="sub">Barraca · Arraiá TI</div>
-  <div class="cartao">
+
+  <!-- Bandeirinhas -->
+  <div class="bandeiras-wrap" id="bandeiras-wrap">
+    <div class="fio"></div>
+    <div class="bandeiras" id="bandeiras"></div>
+  </div>
+
+  <!-- Header -->
+  <div class="header">
+    <h1>Correio Elegante</h1>
+    <div class="subtitle">Barraca · Arraiá TI</div>
+  </div>
+
+  <!-- Main card -->
+  <div class="card">
+
+    <!-- FORM -->
     <div id="form">
 
       <!-- Para -->
-      <label for="para">Para quem é? (nome, turma ou @ do Telegram)</label>
+      <label for="para">Para quem e? <span class="label-accent">*</span></label>
       <div class="para-row">
-        <input id="para" list="destinatarios-list" placeholder="Ex.: Ana 3ºB  ou  @ana" autocomplete="off" />
+        <input id="para" list="destinatarios-list" placeholder="Nome, turma ou @telegram" autocomplete="off" />
         <datalist id="destinatarios-list"></datalist>
-        <div class="badge-tg" id="badge-tg">✓ no Telegram</div>
+        <div class="badge-tg" id="badge-tg">&#10003; no Telegram</div>
       </div>
 
       <!-- Mensagem -->
-      <label for="msg">Mensagem</label>
+      <label for="msg">Mensagem <span class="label-accent">*</span></label>
+
+      <div class="section-label">Modelos rapidos</div>
       <div class="templates" id="templates">
-        <button type="button" class="chip" data-msg="Você ilumina o Arraiá! ☀️">Você ilumina o Arraiá! ☀️</button>
+        <button type="button" class="chip" data-msg="Voce ilumina o Arraiai! &#9728;&#65039;">Voce ilumina o Arraiai! ☀️</button>
         <button type="button" class="chip" data-msg="Tenho algo pra te contar... 🤫">Tenho algo pra te contar... 🤫</button>
-        <button type="button" class="chip" data-msg="Você é incrível, sabia? 💫">Você é incrível, sabia? 💫</button>
-        <button type="button" class="chip" data-msg="Sorria, alguém tá pensando em você 💌">Sorria, alguém tá pensando em você 💌</button>
+        <button type="button" class="chip" data-msg="Voce e incrivel, sabia? 💫">Voce e incrivel, sabia? 💫</button>
+        <button type="button" class="chip" data-msg="Sorria, alguem ta pensando em voce 💌">Sorria, alguem ta pensando em voce 💌</button>
       </div>
+
       <div class="emoji-row" id="emoji-row">
         <button type="button" class="emoji-btn" data-emoji="❤️">❤️</button>
         <button type="button" class="emoji-btn" data-emoji="💕">💕</button>
@@ -208,86 +779,182 @@
         <button type="button" class="emoji-btn" data-emoji="✨">✨</button>
         <button type="button" class="emoji-btn" data-emoji="🌹">🌹</button>
       </div>
-      <textarea id="msg" placeholder="Escreva o correio…" maxlength="400"></textarea>
+
+      <textarea id="msg" placeholder="Escreva sua mensagem..." maxlength="400"></textarea>
       <div class="msg-meta">
-        <span></span>
         <span class="char-count" id="char-count">0 / 400</span>
       </div>
 
+      <div class="divider"></div>
+
       <!-- De -->
       <label for="de">De (como aparece pra quem recebe)</label>
-      <input id="de" placeholder="Seu nome (ou deixe anônimo)" autocomplete="off" />
+      <input id="de" placeholder="Seu nome, ou deixe anonimo" autocomplete="off" />
+
+      <!-- Anon -->
+      <div class="anon-row" onclick="document.getElementById('anon').click(); event.stopPropagation();">
+        <input type="checkbox" id="anon" checked onclick="event.stopPropagation()" />
+        <label for="anon" onclick="event.stopPropagation()">Enviar anonimo 🎭 &mdash; <span style="color:var(--muted);font-weight:400">o destinatario nao sabers quem mandou</span></label>
+      </div>
 
       <!-- Remetente real -->
-      <label for="remetente">Quem está enviando? <span style="color:var(--brasa)">*</span>
-        <small style="font-weight:400;color:var(--tinta-2)">— registro interno, ninguém vê</small></label>
+      <label for="remetente">Quem esta enviando? <span class="label-accent">*</span>
+        <small>&mdash; registro interno, nunca exibido</small></label>
       <input id="remetente" placeholder="Seu nome e turma, ex.: Luiz 3ºA" autocomplete="off" />
 
-      <div class="linha-anon">
-        <input type="checkbox" id="anon" checked />
-        <label for="anon" style="margin:0">Enviar anônimo 🎭</label>
-      </div>
+      <!-- Send -->
+      <button class="btn-send" id="enviar">
+        <div class="spinner"></div>
+        <span class="btn-text">Gerar correio 💌</span>
+      </button>
 
-      <button class="botao" id="enviar">Gerar correio 💌</button>
-      <p class="dica">🔒 Anônimo só pra quem recebe. A organização registra quem enviou, por segurança.</p>
-      <p class="dica">Se a pessoa ativou o bot do Telegram, chega no celular dela na hora. Senão, entregue o código/QR.</p>
-    </div>
+      <p class="hint">
+        <strong>🔒 Seguro:</strong> Anonimo so pra quem recebe. A organizacao registra quem enviou por seguranca.<br>
+        Se a pessoa ativou o bot do Telegram, a mensagem chega na hora!
+      </p>
 
-    <!-- Resultado -->
+    </div><!-- /form -->
+
+    <!-- RESULTADO -->
     <div id="resultado">
-      <div class="cod" id="r-cod">CE-0000</div>
-      <div class="via" id="r-via">—</div>
-      <div id="qr"></div>
-      <a class="link" id="r-link" href="#" target="_blank">—</a>
-      <div class="resultado-acoes">
-        <button id="btn-baixar-qr">📥 Baixar QR</button>
-        <button id="btn-copiar-link">📋 Copiar link</button>
+      <div class="success-header">
+        <div class="success-icon">💌</div>
+        <div class="success-title">Correio enviado!</div>
+        <div class="success-sub">Sua mensagem esta a caminho...</div>
       </div>
-      <button class="novo" id="novo">+ Novo correio</button>
-    </div>
-  </div>
-</div>
+
+      <div class="cod-wrap">
+        <div class="cod-label">Codigo do correio</div>
+        <div class="cod" id="r-cod">CE-0000</div>
+      </div>
+
+      <div class="via" id="r-via">—</div>
+
+      <div id="qr"></div>
+      <a class="link-display" id="r-link" href="#" target="_blank">—</a>
+
+      <div class="resultado-acoes">
+        <button class="btn-action" id="btn-baixar-qr">📥 Baixar QR</button>
+        <button class="btn-action" id="btn-copiar-link">📋 Copiar link</button>
+      </div>
+
+      <button class="btn-novo" id="novo">+ Novo correio</button>
+    </div><!-- /resultado -->
+
+  </div><!-- /card -->
+
+  <!-- Nav links -->
+  <nav class="nav-links">
+    <a class="nav-link" href="/telao">📺 Telao</a>
+    <a class="nav-link" href="/stats">📊 Stats</a>
+    <a class="nav-link" href="/moderacao">🛡️ Moderacao</a>
+  </nav>
+
+</div><!-- /wrap -->
 
 <script>
-// ── Bandeirinhas ──────────────────────────────────────────────────────────────
-const band = document.getElementById("band");
-for (let i = 0; i < 24; i++) band.appendChild(document.createElement("i"));
-
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 const $ = id => document.getElementById(id);
 
-// ── Destinatários (autocomplete + badge Telegram) ─────────────────────────────
+// ─── Floating particles ───────────────────────────────────────────────────────
+(function() {
+  const canvas = $('particles-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H;
+  const GOLD = 'rgba(255,215,0,';
+  const PINK = 'rgba(255,107,157,';
+  const TEAL = 'rgba(0,229,255,';
+  const PALETTES = [GOLD, PINK, TEAL];
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  function Dot() {
+    this.x = Math.random() * W;
+    this.y = Math.random() * H;
+    this.r = 0.8 + Math.random() * 1.6;
+    this.vx = (Math.random() - 0.5) * 0.25;
+    this.vy = -0.15 - Math.random() * 0.35;
+    this.alpha = 0.1 + Math.random() * 0.5;
+    this.palette = PALETTES[Math.floor(Math.random() * PALETTES.length)];
+    this.life = 0;
+    this.maxLife = 200 + Math.random() * 400;
+  }
+
+  const dots = Array.from({length: 60}, () => new Dot());
+
+  function loop() {
+    ctx.clearRect(0, 0, W, H);
+    dots.forEach((d, i) => {
+      d.life++;
+      d.x += d.vx;
+      d.y += d.vy;
+      const t = d.life / d.maxLife;
+      const a = t < 0.2 ? t/0.2 : t > 0.8 ? (1-t)/0.2 : 1;
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, d.r, 0, Math.PI*2);
+      ctx.fillStyle = d.palette + (d.alpha * a).toFixed(2) + ')';
+      ctx.fill();
+      if (d.life >= d.maxLife || d.y < -10 || d.x < -10 || d.x > W+10) {
+        dots[i] = new Dot();
+        dots[i].y = H + 5;
+      }
+    });
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+
+// ─── Bandeirinhas ─────────────────────────────────────────────────────────────
+(function() {
+  const container = $('bandeiras');
+  const wrap = $('bandeiras-wrap');
+  const count = Math.ceil(window.innerWidth / 30) + 4;
+  for (let i = 0; i < count; i++) {
+    const f = document.createElement('i');
+    f.className = 'flag';
+    container.appendChild(f);
+  }
+})();
+
+// ─── Autocomplete + badge Telegram ───────────────────────────────────────────
 let destinatarios = [];
-fetch("/api/destinatarios")
+
+fetch('/api/destinatarios')
   .then(r => r.json())
   .then(lista => {
     destinatarios = lista;
-    const dl = $("destinatarios-list");
+    const dl = $('destinatarios-list');
     lista.forEach(nome => {
-      const opt = document.createElement("option");
+      const opt = document.createElement('option');
       opt.value = nome;
       dl.appendChild(opt);
     });
   })
   .catch(() => {});
 
-$("para").addEventListener("input", () => {
-  const val = $("para").value.trim().toLowerCase();
-  const badge = $("badge-tg");
-  const encontrado = destinatarios.some(d => d.toLowerCase() === val);
-  badge.classList.toggle("show", encontrado && val.length > 0);
+$('para').addEventListener('input', () => {
+  const val = $('para').value.trim().toLowerCase();
+  const badge = $('badge-tg');
+  const found = destinatarios.some(d => d.toLowerCase() === val);
+  badge.classList.toggle('show', found && val.length > 0);
 });
 
-// ── Templates de mensagem ─────────────────────────────────────────────────────
-document.getElementById("templates").addEventListener("click", e => {
-  const chip = e.target.closest(".chip");
+// ─── Template chips ───────────────────────────────────────────────────────────
+$('templates').addEventListener('click', e => {
+  const chip = e.target.closest('.chip');
   if (!chip) return;
-  const ta = $("msg");
+  const ta = $('msg');
   const txt = chip.dataset.msg;
   const start = ta.selectionStart;
-  const end = ta.selectionEnd;
+  const end   = ta.selectionEnd;
   const before = ta.value.substring(0, start);
-  const after = ta.value.substring(end);
-  const novo = before ? before + " " + txt : txt;
+  const after  = ta.value.substring(end);
+  const novo = before ? before + ' ' + txt : txt;
   ta.value = (novo + after).substring(0, 400);
   ta.focus();
   const pos = novo.length;
@@ -296,18 +963,17 @@ document.getElementById("templates").addEventListener("click", e => {
   salvarRascunho();
 });
 
-// ── Emojis rápidos ────────────────────────────────────────────────────────────
-document.getElementById("emoji-row").addEventListener("click", e => {
-  const btn = e.target.closest(".emoji-btn");
+// ─── Emoji buttons ────────────────────────────────────────────────────────────
+$('emoji-row').addEventListener('click', e => {
+  const btn = e.target.closest('.emoji-btn');
   if (!btn) return;
   const emoji = btn.dataset.emoji;
-  const ta = $("msg");
+  const ta    = $('msg');
   const start = ta.selectionStart;
-  const end = ta.selectionEnd;
+  const end   = ta.selectionEnd;
   const before = ta.value.substring(0, start);
-  const after = ta.value.substring(end);
-  const novo = (before + emoji + after).substring(0, 400);
-  ta.value = novo;
+  const after  = ta.value.substring(end);
+  ta.value = (before + emoji + after).substring(0, 400);
   ta.focus();
   const pos = start + emoji.length;
   ta.setSelectionRange(pos, pos);
@@ -315,183 +981,204 @@ document.getElementById("emoji-row").addEventListener("click", e => {
   salvarRascunho();
 });
 
-// ── Contador de caracteres ────────────────────────────────────────────────────
+// ─── Character counter ────────────────────────────────────────────────────────
 function atualizarContador() {
-  const len = $("msg").value.length;
-  const el = $("char-count");
-  el.textContent = len + " / 400";
-  el.className = "char-count" + (len >= 400 ? " cheio" : len >= 340 ? " quase" : "");
+  const len = $('msg').value.length;
+  const el  = $('char-count');
+  el.textContent = len + ' / 400';
+  el.className = 'char-count' + (len >= 400 ? ' cheio' : len >= 340 ? ' quase' : '');
 }
-$("msg").addEventListener("input", () => { atualizarContador(); salvarRascunho(); });
+$('msg').addEventListener('input', () => { atualizarContador(); salvarRascunho(); });
 
-// ── LocalStorage rascunho ─────────────────────────────────────────────────────
-const DRAFT_KEY = "ce_draft";
+// ─── LocalStorage draft ───────────────────────────────────────────────────────
+const DRAFT_KEY = 'ce_draft';
+
 function salvarRascunho() {
   try {
     localStorage.setItem(DRAFT_KEY, JSON.stringify({
-      para: $("para").value,
-      msg: $("msg").value,
-      remetente: $("remetente").value
+      para:      $('para').value,
+      msg:       $('msg').value,
+      remetente: $('remetente').value
     }));
-  } catch (_) {}
+  } catch(_) {}
 }
+
 function carregarRascunho() {
   try {
-    const d = JSON.parse(localStorage.getItem(DRAFT_KEY) || "null");
+    const d = JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null');
     if (!d) return;
-    if (d.para) $("para").value = d.para;
-    if (d.msg) { $("msg").value = d.msg; atualizarContador(); }
-    if (d.remetente) $("remetente").value = d.remetente;
-  } catch (_) {}
+    if (d.para)      $('para').value      = d.para;
+    if (d.msg)       { $('msg').value     = d.msg; atualizarContador(); }
+    if (d.remetente) $('remetente').value = d.remetente;
+  } catch(_) {}
 }
-$("para").addEventListener("input", salvarRascunho);
-$("remetente").addEventListener("input", salvarRascunho);
+
+$('para').addEventListener('input', salvarRascunho);
+$('remetente').addEventListener('input', salvarRascunho);
 carregarRascunho();
 
-// ── Checkbox anônimo ──────────────────────────────────────────────────────────
-$("anon").addEventListener("change", () => { $("de").disabled = $("anon").checked; });
-$("de").disabled = true;
+// ─── Anon checkbox ────────────────────────────────────────────────────────────
+$('anon').addEventListener('change', () => {
+  $('de').disabled = $('anon').checked;
+});
+$('de').disabled = true;
 
-// ── Envio ─────────────────────────────────────────────────────────────────────
-$("enviar").onclick = async () => {
-  const para = $("para").value.trim();
-  const msg = $("msg").value.trim();
-  const remetente = $("remetente").value.trim();
-  if (!para || !msg) { alert("Preencha o destinatário e a mensagem."); return; }
-  if (!remetente) { alert("Identifique quem está enviando (registro interno)."); $("remetente").focus(); return; }
-  $("enviar").disabled = true;
-  $("enviar").textContent = "Gerando…";
+// ─── Send ─────────────────────────────────────────────────────────────────────
+$('enviar').onclick = async () => {
+  const para      = $('para').value.trim();
+  const msg       = $('msg').value.trim();
+  const remetente = $('remetente').value.trim();
+
+  if (!para || !msg)  { alert('Preencha o destinatario e a mensagem.'); return; }
+  if (!remetente)     { alert('Identifique quem esta enviando (registro interno).'); $('remetente').focus(); return; }
+
+  const btn = $('enviar');
+  btn.disabled = true;
+  btn.classList.add('loading');
+
   try {
-    const r = await fetch("/api/correios", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    const r = await fetch('/api/correios', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        para, mensagem: msg,
-        de: $("de").value.trim(),
-        anonimo: $("anon").checked,
+        para,
+        mensagem:       msg,
+        de:             $('de').value.trim(),
+        anonimo:        $('anon').checked,
         remetente_real: remetente
       })
     });
     const d = await r.json();
-    if (!r.ok) throw new Error(d.detail || "erro");
-    // Limpa rascunho após envio
-    try { localStorage.removeItem(DRAFT_KEY); } catch (_) {}
+    if (!r.ok) throw new Error(d.detail || 'erro');
+    try { localStorage.removeItem(DRAFT_KEY); } catch(_) {}
     mostrar(d);
     dispararConfetti();
   } catch (e) {
-    alert("Deu erro: " + e.message);
+    alert('Deu erro: ' + e.message);
+    btn.disabled = false;
+    btn.classList.remove('loading');
   }
-  $("enviar").disabled = false;
-  $("enviar").textContent = "Gerar correio 💌";
 };
 
-// ── Exibir resultado ──────────────────────────────────────────────────────────
-let ultimoLink = "";
-let qrCanvas = null;
+// ─── Show result ──────────────────────────────────────────────────────────────
+let ultimoLink = '';
+let qrCanvas   = null;
 
 function mostrar(d) {
-  $("form").style.display = "none";
-  const res = $("resultado");
-  res.style.display = "block";
-  res.classList.remove("slide-up");
-  // Trigger reflow para reiniciar animação
+  $('form').style.display = 'none';
+  const res = $('resultado');
+  res.style.display = 'block';
+  res.classList.remove('slide-up');
   void res.offsetWidth;
-  res.classList.add("slide-up");
+  res.classList.add('slide-up');
 
-  $("r-cod").textContent = d.codigo;
-  const via = $("r-via");
+  $('r-cod').textContent = d.codigo;
+
+  const via = $('r-via');
   if (d.oculto) {
-    via.className = "via mod"; via.textContent = "⚠️ Retido p/ moderação";
+    via.className = 'via mod';
+    via.textContent = '⚠️ Retido para moderacao';
   } else if (d.telegram) {
-    via.className = "via tg"; via.textContent = "✅ Enviado no Telegram!";
+    via.className = 'via tg';
+    via.textContent = '✅ Enviado no Telegram!';
   } else {
-    via.className = "via lk"; via.textContent = "📲 Entregue por QR / link";
+    via.className = 'via lk';
+    via.textContent = '📲 Entregue por QR / link';
   }
-  $("qr").innerHTML = "";
+
+  $('qr').innerHTML = '';
   qrCanvas = null;
-  ultimoLink = d.link || "";
+  ultimoLink = d.link || '';
+
   if (!d.oculto && window.QRCode) {
-    new QRCode($("qr"), { text: d.link, width: 180, height: 180, correctLevel: QRCode.CorrectLevel.M });
-    // Captura o canvas gerado pelo QRCode
-    setTimeout(() => {
-      qrCanvas = $("qr").querySelector("canvas");
-    }, 100);
+    new QRCode($('qr'), {
+      text:         d.link,
+      width:        180,
+      height:       180,
+      correctLevel: QRCode.CorrectLevel.M
+    });
+    setTimeout(() => { qrCanvas = $('qr').querySelector('canvas'); }, 150);
   }
-  $("r-link").textContent = d.link;
-  $("r-link").href = d.link;
+
+  $('r-link').textContent = d.link;
+  $('r-link').href        = d.link;
 }
 
-// ── Baixar QR ────────────────────────────────────────────────────────────────
-$("btn-baixar-qr").onclick = () => {
-  const canvas = qrCanvas || ($("qr").querySelector("canvas"));
-  if (!canvas) { alert("QR ainda não disponível."); return; }
-  const link = document.createElement("a");
-  link.download = "correio-qr.png";
-  link.href = canvas.toDataURL("image/png");
+// ─── Download QR ──────────────────────────────────────────────────────────────
+$('btn-baixar-qr').onclick = () => {
+  const canvas = qrCanvas || $('qr').querySelector('canvas');
+  if (!canvas) { alert('QR ainda nao disponivel.'); return; }
+  const link = document.createElement('a');
+  link.download = 'correio-qr.png';
+  link.href     = canvas.toDataURL('image/png');
   link.click();
 };
 
-// ── Copiar link ───────────────────────────────────────────────────────────────
-$("btn-copiar-link").onclick = async () => {
+// ─── Copy link ────────────────────────────────────────────────────────────────
+$('btn-copiar-link').onclick = async () => {
   if (!ultimoLink) return;
   try {
     await navigator.clipboard.writeText(ultimoLink);
-    const btn = $("btn-copiar-link");
-    btn.textContent = "✅ Copiado!";
-    setTimeout(() => { btn.textContent = "📋 Copiar link"; }, 2000);
-  } catch (_) {
-    prompt("Copie o link:", ultimoLink);
+    const btn = $('btn-copiar-link');
+    const orig = btn.textContent;
+    btn.textContent = '✅ Copiado!';
+    setTimeout(() => { btn.textContent = orig; }, 2000);
+  } catch(_) {
+    prompt('Copie o link:', ultimoLink);
   }
 };
 
-// ── Novo correio ──────────────────────────────────────────────────────────────
-$("novo").onclick = () => {
-  ["para", "msg", "de", "remetente"].forEach(id => $(id).value = "");
+// ─── New letter ───────────────────────────────────────────────────────────────
+$('novo').onclick = () => {
+  ['para','msg','de','remetente'].forEach(id => $(id).value = '');
   atualizarContador();
-  $("anon").checked = true;
-  $("de").disabled = true;
-  $("badge-tg").classList.remove("show");
-  $("resultado").style.display = "none";
-  $("resultado").classList.remove("slide-up");
-  $("form").style.display = "block";
-  $("para").focus();
+  $('anon').checked = true;
+  $('de').disabled  = true;
+  $('badge-tg').classList.remove('show');
+  $('resultado').style.display = 'none';
+  $('resultado').classList.remove('slide-up');
+  $('form').style.display = 'block';
+  const btn = $('enviar');
+  btn.disabled = false;
+  btn.classList.remove('loading');
+  $('para').focus();
 };
 
-// ── Confetti ──────────────────────────────────────────────────────────────────
+// ─── Confetti ─────────────────────────────────────────────────────────────────
 (function() {
-  const canvas = document.getElementById("confetti-canvas");
-  const ctx = canvas.getContext("2d");
+  const canvas = $('confetti-canvas');
+  const ctx    = canvas.getContext('2d');
   let particles = [];
   let animFrame = null;
-  let running = false;
+  let running   = false;
 
-  const COLORS = ["#ff6fae","#ffc83d","#3ec46d","#43b3ff","#ff7a2d","#ff3d3d","#a259ff"];
+  const COLORS = ['#ff6b9d','#ffd700','#22c55e','#00e5ff','#c44dff','#ef4444','#a259ff'];
 
   function resize() {
-    canvas.width = window.innerWidth;
+    canvas.width  = window.innerWidth;
     canvas.height = window.innerHeight;
   }
-  window.addEventListener("resize", resize);
+  window.addEventListener('resize', resize);
   resize();
 
   function Particle() {
-    this.x = Math.random() * canvas.width;
-    this.y = -10;
-    this.r = 5 + Math.random() * 7;
+    this.x     = Math.random() * canvas.width;
+    this.y     = -10;
+    this.r     = 5 + Math.random() * 7;
     this.color = COLORS[Math.floor(Math.random() * COLORS.length)];
-    this.vx = (Math.random() - 0.5) * 4;
-    this.vy = 3 + Math.random() * 5;
+    this.vx    = (Math.random() - 0.5) * 4;
+    this.vy    = 3 + Math.random() * 5;
     this.angle = Math.random() * Math.PI * 2;
-    this.spin = (Math.random() - 0.5) * 0.2;
-    this.shape = Math.random() > 0.5 ? "rect" : "circle";
+    this.spin  = (Math.random() - 0.5) * 0.22;
+    this.shape = Math.random() > 0.5 ? 'rect' : 'circle';
     this.alpha = 1;
   }
 
   Particle.prototype.update = function() {
-    this.x += this.vx;
-    this.y += this.vy;
+    this.x     += this.vx;
+    this.y     += this.vy;
     this.angle += this.spin;
-    this.vy += 0.08; // gravidade
+    this.vy    += 0.08;
     if (this.y > canvas.height * 0.6) this.alpha -= 0.04;
   };
 
@@ -501,11 +1188,11 @@ $("novo").onclick = () => {
     ctx.translate(this.x, this.y);
     ctx.rotate(this.angle);
     ctx.fillStyle = this.color;
-    if (this.shape === "rect") {
-      ctx.fillRect(-this.r / 2, -this.r / 2, this.r, this.r * 0.5);
+    if (this.shape === 'rect') {
+      ctx.fillRect(-this.r/2, -this.r/2, this.r, this.r * 0.5);
     } else {
       ctx.beginPath();
-      ctx.arc(0, 0, this.r / 2, 0, Math.PI * 2);
+      ctx.arc(0, 0, this.r/2, 0, Math.PI*2);
       ctx.fill();
     }
     ctx.restore();
@@ -525,8 +1212,8 @@ $("novo").onclick = () => {
 
   window.dispararConfetti = function() {
     resize();
-    for (let i = 0; i < 140; i++) {
-      setTimeout(() => particles.push(new Particle()), Math.random() * 600);
+    for (let i = 0; i < 160; i++) {
+      setTimeout(() => particles.push(new Particle()), Math.random() * 700);
     }
     if (!running) {
       running = true;
@@ -535,4 +1222,5 @@ $("novo").onclick = () => {
   };
 })();
 </script>
-</body></html>
+</body>
+</html>

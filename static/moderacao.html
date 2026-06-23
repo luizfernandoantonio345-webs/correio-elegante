@@ -2,519 +2,486 @@
 <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="manifest" href="/static/manifest.json" />
 <title>Moderação · Correio Elegante</title>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 <style>
-  :root{
-    --bg:#0e1022;--surface:#171930;--surface-2:#1f2245;--border:rgba(255,255,255,.09);
-    --kraft:#f3e7cf;--milho:#ffc83d;--brasa:#ff7a2d;--verde:#3ec46d;
-    --muted:rgba(255,255,255,.45);--danger:#ff4444;--warn:#f5c518;
-    --radius:14px;--radius-sm:9px
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  html{scroll-behavior:smooth}
-  body{font-family:"Outfit",system-ui,sans-serif;background:var(--bg);color:var(--kraft);min-height:100vh;padding:0 0 60px}
+:root{
+  --bg:#080914;--card:rgba(255,255,255,.04);--card2:rgba(255,255,255,.07);
+  --border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.15);
+  --pink:#ff6b9d;--gold:#ffd700;--teal:#00e5ff;--purple:#c44dff;
+  --green:#3ec46d;--red:#ff4444;--warn:#f5c518;
+  --text:#f0f0f8;--muted:#8888aa;
+  --grad:linear-gradient(135deg,#ff6b9d,#c44dff,#00e5ff)
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Outfit',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:60px}
 
-  /* ─── Header ─── */
-  .header{background:linear-gradient(135deg,#1a1040,#2a1155);border-bottom:1px solid var(--border);
-    padding:20px 24px;display:flex;align-items:center;gap:12px}
-  .header-icon{font-size:28px}
-  .header h1{font-size:20px;font-weight:800;letter-spacing:-.3px}
-  .header p{font-size:13px;color:var(--muted);margin-top:2px}
+/* Bg glow */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 800px 400px at 15% -5%,rgba(196,77,255,.08) 0,transparent 70%),
+    radial-gradient(ellipse 700px 400px at 85% 105%,rgba(255,107,157,.08) 0,transparent 70%)
+}
 
-  /* ─── Layout ─── */
-  .wrap{max-width:860px;margin:0 auto;padding:24px 20px}
+/* ── Header ── */
+.header{
+  position:relative;z-index:10;
+  background:rgba(10,10,25,.85);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  padding:18px 24px;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap
+}
+.header-left{display:flex;align-items:center;gap:12px}
+.header-icon{
+  width:44px;height:44px;border-radius:12px;
+  background:var(--grad);display:grid;place-items:center;font-size:22px;flex-shrink:0
+}
+.header h1{font-size:1.1rem;font-weight:800;letter-spacing:-.2px}
+.header p{font-size:.78rem;color:var(--muted);margin-top:2px}
+.header-nav{display:flex;gap:8px;flex-wrap:wrap}
+.nav-lk{
+  font-size:.78rem;color:var(--muted);text-decoration:none;
+  padding:6px 12px;border-radius:10px;border:1px solid var(--border);
+  transition:color .15s,border-color .15s,background .15s
+}
+.nav-lk:hover{color:var(--text);border-color:var(--border2);background:var(--card)}
 
-  /* ─── Login ─── */
-  .login-card{
-    background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-    padding:32px;max-width:420px;margin:60px auto;text-align:center
-  }
-  .login-card h2{font-size:18px;margin-bottom:6px}
-  .login-card p{color:var(--muted);font-size:14px;margin-bottom:22px}
-  .login-row{display:flex;gap:10px}
-  .login-row input{
-    flex:1;font:inherit;padding:12px 14px;border-radius:var(--radius-sm);
-    border:1.5px solid var(--border);background:var(--surface-2);color:var(--kraft);font-size:14px
-  }
-  .login-row input:focus{outline:none;border-color:var(--milho)}
-  .btn{
-    font:inherit;font-weight:700;font-size:14px;border:none;border-radius:var(--radius-sm);
-    padding:12px 18px;cursor:pointer;background:var(--brasa);color:#fff;
-    transition:filter .15s,transform .12s;white-space:nowrap
-  }
-  .btn:hover{filter:brightness(1.1)}
-  .btn:active{transform:scale(.97)}
-  .btn.verde{background:var(--verde)}
-  .btn.muted{background:var(--surface-2);color:var(--kraft);border:1px solid var(--border)}
-  .btn.danger{background:var(--danger)}
-  .btn.sm{padding:8px 13px;font-size:13px}
+/* ── Wrap ── */
+.wrap{max-width:920px;margin:0 auto;padding:28px 20px;position:relative;z-index:5}
 
-  /* ─── Stats cards ─── */
-  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
-  @media(max-width:640px){.stats{grid-template-columns:repeat(2,1fr)}}
-  .stat-card{
-    background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-    padding:18px 16px;text-align:center
-  }
-  .stat-card .stat-num{font-size:32px;font-weight:800;line-height:1;margin-bottom:4px}
-  .stat-card .stat-label{font-size:12px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase}
-  .stat-card.s-total .stat-num{color:var(--milho)}
-  .stat-card.s-ocultos .stat-num{color:var(--danger)}
-  .stat-card.s-flags .stat-num{color:var(--warn)}
-  .stat-card.s-entrega .stat-num{color:var(--verde)}
+/* ── Login ── */
+.login-card{
+  background:var(--card);border:1px solid var(--border);border-radius:20px;
+  padding:40px 32px;max-width:420px;margin:60px auto;text-align:center;
+  backdrop-filter:blur(12px)
+}
+.login-card h2{
+  font-family:'Playfair Display',serif;font-size:1.5rem;margin-bottom:8px;color:#fff
+}
+.login-card p{font-size:.85rem;color:var(--muted);margin-bottom:24px;line-height:1.5}
+.login-input{
+  width:100%;font:inherit;font-size:1rem;padding:14px 16px;
+  background:rgba(255,255,255,.07);border:1.5px solid var(--border);border-radius:14px;
+  color:var(--text);margin-bottom:12px;transition:border-color .2s,box-shadow .2s;outline:none;
+  -webkit-appearance:none;appearance:none
+}
+.login-input:focus{border-color:var(--pink);box-shadow:0 0 0 4px rgba(255,107,157,.15)}
+.login-btn{
+  width:100%;font:inherit;font-size:1rem;font-weight:700;
+  padding:14px;border-radius:14px;border:none;cursor:pointer;
+  background:var(--grad);color:#fff;letter-spacing:.3px;
+  transition:transform .15s,filter .15s
+}
+.login-btn:hover{transform:translateY(-2px);filter:brightness(1.1)}
+.login-err{font-size:.82rem;color:var(--red);margin-top:10px;display:none}
 
-  /* ─── Toolbar ─── */
-  .toolbar{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px;align-items:center}
-  .toolbar input[type=text]{
-    flex:1;min-width:200px;font:inherit;font-size:14px;
-    padding:10px 14px;border-radius:var(--radius-sm);
-    border:1.5px solid var(--border);background:var(--surface-2);color:var(--kraft)
-  }
-  .toolbar input[type=text]:focus{outline:none;border-color:var(--milho)}
-  .toolbar select{
-    font:inherit;font-size:14px;padding:10px 12px;border-radius:var(--radius-sm);
-    border:1.5px solid var(--border);background:var(--surface-2);color:var(--kraft);cursor:pointer
-  }
-  .toolbar select:focus{outline:none;border-color:var(--milho)}
-  .refresh-label{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--muted);cursor:pointer;white-space:nowrap}
-  .refresh-label input[type=checkbox]{accent-color:var(--milho);width:16px;height:16px;cursor:pointer}
+/* ── Stats cards ── */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:24px}
+.stat-card{
+  background:var(--card);border:1px solid var(--border);border-radius:16px;
+  padding:18px 14px;text-align:center;transition:transform .2s,border-color .3s
+}
+.stat-card:hover{transform:translateY(-3px)}
+.stat-n{font-size:2.2rem;font-weight:900;line-height:1}
+.stat-l{font-size:.72rem;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-top:6px}
+.stat-card:nth-child(1) .stat-n{color:var(--pink)}
+.stat-card:nth-child(2) .stat-n{color:var(--gold)}
+.stat-card:nth-child(3) .stat-n{color:var(--red)}
+.stat-card:nth-child(4) .stat-n{color:var(--teal)}
+.stat-card:nth-child(1){border-color:rgba(255,107,157,.2)}
+.stat-card:nth-child(2){border-color:rgba(255,215,0,.2)}
+.stat-card:nth-child(3){border-color:rgba(255,68,68,.2)}
+.stat-card:nth-child(4){border-color:rgba(0,229,255,.2)}
 
-  /* ─── Cards ─── */
-  #lista{display:flex;flex-direction:column;gap:12px}
-  .item{
-    background:var(--surface);border:1.5px solid var(--border);
-    border-radius:var(--radius);padding:18px 18px 14px;
-    transition:border-color .2s,opacity .2s;position:relative
-  }
-  .item.sev-warn{border-color:rgba(245,197,24,.45)}
-  .item.sev-danger{border-color:rgba(255,68,68,.5)}
-  .item.sev-oculto{opacity:.45;border-color:rgba(255,255,255,.05)}
+/* ── Toolbar ── */
+.toolbar{
+  display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap
+}
+.search-input{
+  flex:1;min-width:180px;font:inherit;font-size:.9rem;padding:10px 14px;
+  background:rgba(255,255,255,.06);border:1.5px solid var(--border);border-radius:12px;
+  color:var(--text);outline:none;transition:border-color .2s;-webkit-appearance:none;appearance:none
+}
+.search-input:focus{border-color:var(--pink)}
+.search-input::placeholder{color:var(--muted)}
+select.filter-sel{
+  font:inherit;font-size:.85rem;padding:10px 12px;
+  background:rgba(255,255,255,.06);border:1.5px solid var(--border);border-radius:12px;
+  color:var(--text);cursor:pointer;outline:none;-webkit-appearance:none;appearance:none
+}
+.toolbar-btn{
+  font:inherit;font-size:.82rem;font-weight:600;padding:10px 14px;
+  border-radius:12px;border:1.5px solid var(--border);background:var(--card);
+  color:var(--text);cursor:pointer;white-space:nowrap;transition:background .15s,border-color .15s,transform .1s
+}
+.toolbar-btn:hover{background:var(--card2);border-color:var(--border2);transform:translateY(-1px)}
+.toolbar-btn.refresh-auto{border-color:rgba(62,196,109,.3)}
+.toolbar-btn.refresh-auto.on{background:rgba(62,196,109,.15);border-color:var(--green);color:var(--green)}
+.result-count{font-size:.8rem;color:var(--muted);white-space:nowrap}
 
-  .item-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px}
-  .item-top-left{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
-  .item-top-right{display:flex;gap:7px;align-items:center;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end}
+/* ── Cards de correio ── */
+.cards{display:flex;flex-direction:column;gap:10px}
 
-  .cod{font-family:monospace;font-weight:800;font-size:14px;letter-spacing:.5px;
-    color:var(--milho);background:rgba(255,200,61,.1);padding:3px 9px;border-radius:6px}
-  .badge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;letter-spacing:.3px}
-  .badge-flag{background:rgba(255,68,68,.2);color:#ff8888;border:1px solid rgba(255,68,68,.4)}
-  .badge-oculto{background:rgba(255,255,255,.06);color:var(--muted);border:1px solid var(--border)}
-  .badge-ok{background:rgba(62,196,109,.12);color:#7ee8a2;border:1px solid rgba(62,196,109,.3)}
+.msg-card{
+  background:var(--card);border:1px solid var(--border);border-radius:16px;
+  overflow:hidden;transition:border-color .2s
+}
+.msg-card:hover{border-color:var(--border2)}
+.msg-card.flagged{border-color:rgba(245,197,24,.35);background:rgba(245,197,24,.03)}
+.msg-card.severe{border-color:rgba(255,68,68,.4);background:rgba(255,68,68,.04)}
+.msg-card.hidden{opacity:.5}
+.msg-card.hidden:hover{opacity:.8}
 
-  .item-para{font-size:15px;font-weight:600;color:#fff;margin-bottom:5px}
-  .item-msg{
-    font-size:14px;line-height:1.55;color:rgba(243,231,207,.85);
-    padding:10px 13px;background:rgba(0,0,0,.2);border-radius:8px;margin-bottom:10px;
-    font-style:italic
-  }
-  .item-meta{font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 14px;margin-bottom:8px}
-  .item-meta span{display:flex;align-items:center;gap:4px}
+.card-head{
+  display:flex;align-items:flex-start;gap:12px;padding:16px 16px 12px;flex-wrap:wrap;gap:8px
+}
+.card-cod{
+  font-size:.7rem;font-weight:700;letter-spacing:1px;
+  padding:3px 8px;border-radius:6px;background:rgba(255,255,255,.08);color:var(--muted);
+  flex-shrink:0;margin-top:1px
+}
+.card-para{font-size:1rem;font-weight:700;color:#fff;flex:1;min-width:120px}
+.card-de{font-size:.82rem;color:var(--muted);flex:1;min-width:120px;margin-top:2px}
+.card-tags{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-left:auto}
+.tag{
+  font-size:10px;font-weight:800;letter-spacing:.5px;
+  padding:4px 10px;border-radius:20px;white-space:nowrap
+}
+.tag.tg{background:rgba(29,111,209,.3);color:#7ec8ff;border:1px solid rgba(29,111,209,.3)}
+.tag.lk{background:rgba(255,200,61,.15);color:var(--gold);border:1px solid rgba(255,200,61,.25)}
+.tag.oculto{background:rgba(255,68,68,.2);color:var(--red);border:1px solid rgba(255,68,68,.3)}
+.tag.visivel{background:rgba(62,196,109,.15);color:var(--green);border:1px solid rgba(62,196,109,.25)}
+.tag.mod{background:rgba(245,197,24,.15);color:var(--warn);border:1px solid rgba(245,197,24,.3)}
 
-  .item-quem{
-    font-size:12px;padding:9px 12px;border-radius:8px;
-    background:rgba(255,200,61,.08);border:1px solid rgba(255,200,61,.15);
-    color:#ffd98a;display:flex;flex-wrap:wrap;gap:6px 16px
-  }
-  .item-quem b{color:#ffe588}
+.card-msg{
+  padding:0 16px 12px;font-size:.9rem;line-height:1.55;color:rgba(240,240,248,.85);
+  border-top:1px solid var(--border);padding-top:12px;
+  word-break:break-word;font-style:italic
+}
+.card-msg::before{content:'\201C';color:var(--muted);}
+.card-msg::after{content:'\201D';color:var(--muted);}
 
-  .item-terms{
-    margin-top:8px;font-size:12px;padding:7px 12px;border-radius:8px;
-    background:rgba(255,68,68,.08);border:1px solid rgba(255,68,68,.2);color:#ff9999
-  }
-  .item-terms b{color:#ffbbbb}
+.card-meta{
+  padding:8px 16px 14px;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px
+}
+.card-info{font-size:.72rem;color:var(--muted);line-height:1.6}
+.card-info b{color:rgba(240,240,248,.7)}
+.card-actions{display:flex;gap:8px;flex-wrap:wrap}
+.act-btn{
+  font:inherit;font-size:.78rem;font-weight:600;padding:7px 12px;
+  border-radius:10px;border:1.5px solid var(--border);background:transparent;
+  color:var(--text);cursor:pointer;transition:all .15s;white-space:nowrap
+}
+.act-btn:hover{background:var(--card2);transform:translateY(-1px)}
+.act-btn.hide-btn:hover{border-color:rgba(255,68,68,.5);color:var(--red);background:rgba(255,68,68,.08)}
+.act-btn.show-btn:hover{border-color:rgba(62,196,109,.5);color:var(--green);background:rgba(62,196,109,.08)}
+.act-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
 
-  /* IP bulk button */
-  .btn-ip{font-size:11px;padding:5px 10px;border-radius:6px;font-family:monospace;
-    background:rgba(255,122,45,.15);color:#ffa06a;border:1px solid rgba(255,122,45,.3);
-    cursor:pointer;font-weight:600}
-  .btn-ip:hover{background:rgba(255,122,45,.28)}
+.flag-terms{
+  margin:0 16px 12px;padding:8px 12px;
+  background:rgba(245,197,24,.08);border:1px solid rgba(245,197,24,.2);
+  border-radius:10px;font-size:.75rem;color:var(--warn)
+}
 
-  /* ─── Empty / error states ─── */
-  .vazio{text-align:center;padding:50px 20px;color:var(--muted);font-size:15px}
-  .vazio .vazio-icon{font-size:40px;margin-bottom:12px}
+/* ── Remetente real (interno) ── */
+.remetente-real{
+  margin:0 16px 12px;padding:8px 12px;
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+  border-radius:10px;font-size:.75rem;color:rgba(240,240,248,.6)
+}
+.remetente-real b{color:rgba(240,240,248,.85)}
 
-  /* ─── Toast ─── */
-  #toast-container{position:fixed;bottom:24px;right:24px;z-index:1000;display:flex;flex-direction:column;gap:8px;pointer-events:none}
-  .toast{
-    background:#1f2245;border:1px solid var(--border);border-radius:var(--radius-sm);
-    padding:12px 18px;font-size:14px;font-weight:600;color:var(--kraft);
-    box-shadow:0 8px 32px rgba(0,0,0,.4);
-    transform:translateX(120%);transition:transform .3s cubic-bezier(.2,.8,.2,1);
-    pointer-events:none;max-width:280px
-  }
-  .toast.show{transform:translateX(0)}
-  .toast.toast-ok{border-color:rgba(62,196,109,.4);color:#7ee8a2}
-  .toast.toast-danger{border-color:rgba(255,68,68,.4);color:#ff9999}
+/* ── Toast ── */
+.toast{
+  position:fixed;bottom:24px;right:24px;z-index:9999;
+  background:#1e1e36;border:1px solid var(--border2);border-radius:14px;
+  padding:14px 20px;font-size:.88rem;font-weight:600;
+  box-shadow:0 12px 40px rgba(0,0,0,.5);
+  transform:translateY(120%);transition:transform .3s cubic-bezier(.2,.8,.2,1)
+}
+.toast.show{transform:translateY(0)}
+.toast.ok{border-color:rgba(62,196,109,.4);color:var(--green)}
+.toast.err{border-color:rgba(255,68,68,.4);color:var(--red)}
 
-  /* ─── Confirm dialog ─── */
-  .dialog-overlay{
-    position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);
-    z-index:500;display:none;place-items:center
-  }
-  .dialog-overlay.open{display:grid}
-  .dialog-box{
-    background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-    padding:28px;max-width:360px;width:90%;text-align:center
-  }
-  .dialog-box h3{font-size:17px;margin-bottom:8px}
-  .dialog-box p{font-size:14px;color:var(--muted);margin-bottom:22px;line-height:1.5}
-  .dialog-btns{display:flex;gap:10px;justify-content:center}
+/* ── Vazio / loading ── */
+.empty{text-align:center;padding:60px 24px;color:var(--muted)}
+.empty span{font-size:3rem;display:block;margin-bottom:12px}
 
-  /* ─── Export button area ─── */
-  .toolbar-right{display:flex;gap:8px;align-items:center}
-
-  /* ─── Scrollbar ─── */
-  ::-webkit-scrollbar{width:6px}
-  ::-webkit-scrollbar-track{background:transparent}
-  ::-webkit-scrollbar-thumb{background:var(--surface-2);border-radius:3px}
+/* ── Diálogo ── */
+.dlg-overlay{
+  position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.7);
+  display:none;align-items:center;justify-content:center;padding:16px
+}
+.dlg-overlay.on{display:flex}
+.dlg{
+  background:#12122a;border:1px solid var(--border2);border-radius:20px;
+  padding:32px;max-width:380px;width:100%;text-align:center
+}
+.dlg h3{font-size:1.1rem;font-weight:700;margin-bottom:10px}
+.dlg p{font-size:.85rem;color:var(--muted);margin-bottom:24px;line-height:1.5}
+.dlg-btns{display:flex;gap:10px;justify-content:center}
+.dlg-ok{
+  font:inherit;font-size:.9rem;font-weight:700;padding:11px 24px;
+  border-radius:12px;border:none;cursor:pointer;
+  background:var(--red);color:#fff;transition:filter .15s
+}
+.dlg-ok:hover{filter:brightness(1.1)}
+.dlg-cancel{
+  font:inherit;font-size:.9rem;font-weight:600;padding:11px 24px;
+  border-radius:12px;border:1.5px solid var(--border);background:transparent;
+  color:var(--text);cursor:pointer;transition:background .15s
+}
+.dlg-cancel:hover{background:var(--card)}
 </style>
-</head><body>
+</head>
+<body>
 
 <div class="header">
-  <div class="header-icon">🛡️</div>
-  <div>
-    <h1>Moderação dos Correios</h1>
-    <p>Arraiá TI · Painel administrativo</p>
+  <div class="header-left">
+    <div class="header-icon">🛡️</div>
+    <div>
+      <h1>Moderação · Correio Elegante</h1>
+      <p>Painel administrativo interno</p>
+    </div>
+  </div>
+  <nav class="header-nav">
+    <a class="nav-lk" href="/">✉️ Barraca</a>
+    <a class="nav-lk" href="/telao">📺 Telão</a>
+    <a class="nav-lk" href="/stats">📊 Stats</a>
+  </nav>
+</div>
+
+<!-- Login -->
+<div class="wrap" id="login-wrap">
+  <div class="login-card">
+    <h2>🔐 Acesso Restrito</h2>
+    <p>Digite a chave de moderação para continuar.</p>
+    <input class="login-input" type="password" id="chave" placeholder="Chave de moderação" />
+    <button class="login-btn" id="login-btn">Entrar</button>
+    <p class="login-err" id="login-err">Chave incorreta.</p>
   </div>
 </div>
 
-<div class="wrap">
-  <!-- Login -->
-  <div class="login-card" id="login-card">
-    <h2>Acesso restrito</h2>
-    <p>Digite a chave de moderação para continuar</p>
-    <div class="login-row">
-      <input id="key" type="password" placeholder="Chave de moderação (ADMIN_KEY)" autocomplete="current-password" />
-      <button class="btn" id="entrar">Entrar</button>
-    </div>
-    <div id="login-erro" style="color:#ff8888;font-size:13px;margin-top:12px;display:none">Chave inválida. Tente novamente.</div>
+<!-- Painel principal (oculto até login) -->
+<div class="wrap" id="painel" style="display:none">
+
+  <!-- Stats -->
+  <div class="stats-grid" id="stats-grid">
+    <div class="stat-card"><div class="stat-n" id="s-total">0</div><div class="stat-l">Total</div></div>
+    <div class="stat-card"><div class="stat-n" id="s-entregues">0</div><div class="stat-l">Entregues</div></div>
+    <div class="stat-card"><div class="stat-n" id="s-flagged">0</div><div class="stat-l">Retidos</div></div>
+    <div class="stat-card"><div class="stat-n" id="s-ocultos">0</div><div class="stat-l">Ocultos</div></div>
   </div>
 
-  <!-- Dashboard (hidden until login) -->
-  <div id="dashboard" style="display:none">
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <input class="search-input" type="search" id="busca" placeholder="🔍 Buscar por destinatário ou mensagem…" />
+    <select class="filter-sel" id="filtro">
+      <option value="todos">Todos</option>
+      <option value="retidos">Retidos / Flagged</option>
+      <option value="ocultos">Ocultos</option>
+      <option value="visiveis">Visíveis</option>
+    </select>
+    <select class="filter-sel" id="ordem">
+      <option value="novo">Mais recente</option>
+      <option value="antigo">Mais antigo</option>
+    </select>
+    <button class="toolbar-btn refresh-auto" id="auto-btn">⟳ Auto 30s</button>
+    <button class="toolbar-btn" id="exportar-btn">📤 CSV</button>
+    <span class="result-count" id="result-count"></span>
+  </div>
 
-    <!-- Stats -->
-    <div class="stats" id="stats">
-      <div class="stat-card s-total"><div class="stat-num" id="s-total">—</div><div class="stat-label">Total de correios</div></div>
-      <div class="stat-card s-ocultos"><div class="stat-num" id="s-ocultos">—</div><div class="stat-label">Ocultos</div></div>
-      <div class="stat-card s-flags"><div class="stat-num" id="s-flags">—</div><div class="stat-label">Sinalizados</div></div>
-      <div class="stat-card s-entrega"><div class="stat-num" id="s-entrega">—%</div><div class="stat-label">Taxa de entrega</div></div>
-    </div>
-
-    <!-- Toolbar -->
-    <div class="toolbar">
-      <input type="text" id="busca" placeholder="🔍  Buscar por destinatário, remetente ou mensagem…" />
-      <select id="ordenar">
-        <option value="recente">Mais recentes</option>
-        <option value="flags">Sinalizados primeiro</option>
-        <option value="ocultos">Ocultos primeiro</option>
-      </select>
-      <div class="toolbar-right">
-        <button class="btn sm verde" id="btn-refresh">↻ Atualizar</button>
-        <button class="btn sm muted" id="btn-export">⬇ CSV</button>
-        <label class="refresh-label">
-          <input type="checkbox" id="auto-refresh" /> Atualizar (30s)
-        </label>
-      </div>
-    </div>
-
-    <!-- List -->
-    <div id="lista"></div>
+  <div class="cards" id="cards">
+    <div class="empty"><span>⏳</span>Carregando mensagens…</div>
   </div>
 </div>
 
-<!-- Confirm dialog -->
-<div class="dialog-overlay" id="dialog-overlay">
-  <div class="dialog-box">
-    <h3 id="dialog-title">Confirmar ação</h3>
-    <p id="dialog-msg">Tem certeza que quer ocultar esta mensagem?</p>
-    <div class="dialog-btns">
-      <button class="btn muted" id="dialog-cancel">Cancelar</button>
-      <button class="btn danger" id="dialog-ok">Confirmar</button>
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Diálogo de confirmação -->
+<div class="dlg-overlay" id="dlg">
+  <div class="dlg">
+    <h3 id="dlg-titulo">Confirmar ação</h3>
+    <p id="dlg-msg">Tem certeza?</p>
+    <div class="dlg-btns">
+      <button class="dlg-cancel" id="dlg-cancel">Cancelar</button>
+      <button class="dlg-ok" id="dlg-ok">Confirmar</button>
     </div>
   </div>
 </div>
-
-<!-- Toast container -->
-<div id="toast-container"></div>
 
 <script>
-(function(){
-  const $ = id => document.getElementById(id);
+'use strict';
+const $=id=>document.getElementById(id);
 
-  let KEY = "";
-  let todosCorreios = [];
-  let autoTimer = null;
+/* ── Toast ── */
+let toastT;
+function toast(msg,tipo='ok'){
+  const t=$('toast');
+  t.textContent=msg;t.className='toast '+tipo+' show';
+  clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),3000);
+}
 
-  /* ─── Toast ─── */
-  function toast(msg, tipo = "ok") {
-    const el = document.createElement("div");
-    el.className = "toast toast-" + tipo;
-    el.textContent = msg;
-    $("toast-container").appendChild(el);
-    requestAnimationFrame(() => { requestAnimationFrame(() => { el.classList.add("show"); }); });
-    setTimeout(() => {
-      el.classList.remove("show");
-      setTimeout(() => el.remove(), 350);
-    }, 3000);
-  }
+/* ── Diálogo ── */
+function confirmar(titulo,msg,cb){
+  $('dlg-titulo').textContent=titulo;
+  $('dlg-msg').textContent=msg;
+  $('dlg').className='dlg-overlay on';
+  const ok=$('dlg-ok'),cn=$('dlg-cancel');
+  const cleanup=()=>{$('dlg').className='dlg-overlay';ok.onclick=cn.onclick=null;};
+  ok.onclick=()=>{cleanup();cb();};
+  cn.onclick=cleanup;
+}
 
-  /* ─── Confirm dialog ─── */
-  function confirmar(titulo, msg) {
-    return new Promise(resolve => {
-      $("dialog-title").textContent = titulo;
-      $("dialog-msg").textContent = msg;
-      $("dialog-overlay").classList.add("open");
-      function cleanup(val) {
-        $("dialog-overlay").classList.remove("open");
-        $("dialog-ok").onclick = null;
-        $("dialog-cancel").onclick = null;
-        resolve(val);
-      }
-      $("dialog-ok").onclick = () => cleanup(true);
-      $("dialog-cancel").onclick = () => cleanup(false);
-    });
-  }
+/* ── Estado ── */
+let chave='',todos=[],autoId=null;
+const DRAFT='ce_mod_key';
+try{chave=localStorage.getItem(DRAFT)||'';}catch(_){}
 
-  /* ─── Login ─── */
-  async function entrar() {
-    KEY = $("key").value.trim();
-    if (!KEY) return;
-    $("login-erro").style.display = "none";
-    await carregar(true);
-  }
-  $("entrar").onclick = entrar;
-  $("key").addEventListener("keydown", e => { if (e.key === "Enter") entrar(); });
+/* ── Login ── */
+async function tentarLogin(k){
+  try{
+    const r=await fetch('/api/admin/correios?key='+encodeURIComponent(k));
+    if(!r.ok){$('login-err').style.display='block';return false;}
+    chave=k;
+    try{localStorage.setItem(DRAFT,k);}catch(_){}
+    $('login-wrap').style.display='none';
+    $('painel').style.display='block';
+    carregar();
+    return true;
+  }catch(e){$('login-err').style.display='block';return false;}
+}
+$('login-btn').onclick=()=>{$('login-err').style.display='none';tentarLogin($('chave').value.trim());};
+$('chave').onkeydown=e=>{if(e.key==='Enter')$('login-btn').click();};
+if(chave)tentarLogin(chave);
 
-  /* ─── Carregar dados ─── */
-  async function carregar(primeiraVez = false) {
-    if (!KEY) return;
-    try {
-      const r = await fetch("/api/admin/correios?key=" + encodeURIComponent(KEY));
-      if (!r.ok) {
-        if (primeiraVez) {
-          $("login-erro").style.display = "block";
-          KEY = "";
-        }
-        return;
-      }
-      const cs = await r.json();
-      todosCorreios = cs;
-      if (primeiraVez) {
-        $("login-card").style.display = "none";
-        $("dashboard").style.display = "block";
-      }
-      atualizarStats(cs);
-      renderizar();
-      if (!primeiraVez) toast("Lista atualizada ✓", "ok");
-    } catch(e) {
-      if (primeiraVez) { $("login-erro").textContent = "Erro de rede. Tente novamente."; $("login-erro").style.display = "block"; }
-    }
-  }
-
-  /* ─── Stats ─── */
-  function atualizarStats(cs) {
-    const total = cs.length;
-    const ocultos = cs.filter(c => c.oculto).length;
-    const flags = cs.filter(c => c.termos).length;
-    const entregues = cs.filter(c => c.entregue).length;
-    const taxa = total > 0 ? Math.round(entregues / total * 100) : 0;
-    $("s-total").textContent = total;
-    $("s-ocultos").textContent = ocultos;
-    $("s-flags").textContent = flags;
-    $("s-entrega").textContent = taxa + "%";
-  }
-
-  /* ─── Escape HTML ─── */
-  function esc(s) {
-    return (s || "").replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
-  }
-
-  /* ─── Contagem de termos ─── */
-  function contarTermos(termos) {
-    if (!termos) return 0;
-    return termos.split(",").map(s => s.trim()).filter(Boolean).length;
-  }
-
-  /* ─── Renderizar lista ─── */
-  function renderizar() {
-    const busca = $("busca").value.toLowerCase();
-    const ordem = $("ordenar").value;
-
-    /* Contar IPs para detectar duplicados */
-    const contadorIP = {};
-    todosCorreios.forEach(c => {
-      if (c.ip) contadorIP[c.ip] = (contadorIP[c.ip] || 0) + 1;
-    });
-
-    /* Filtrar */
-    let lista = todosCorreios.filter(c => {
-      if (!busca) return true;
-      return (c.para || "").toLowerCase().includes(busca) ||
-             (c.mensagem || "").toLowerCase().includes(busca) ||
-             (c.remetente_real || "").toLowerCase().includes(busca) ||
-             (c.de || "").toLowerCase().includes(busca);
-    });
-
-    /* Ordenar */
-    if (ordem === "flags") {
-      lista = lista.slice().sort((a, b) => contarTermos(b.termos) - contarTermos(a.termos));
-    } else if (ordem === "ocultos") {
-      lista = lista.slice().sort((a, b) => (b.oculto ? 1 : 0) - (a.oculto ? 1 : 0));
-    }
-
-    const container = $("lista");
-    if (!lista.length) {
-      container.innerHTML = `<div class="vazio"><div class="vazio-icon">📭</div>${busca ? "Nenhum resultado para "" + esc(busca) + ""." : "Nenhum correio ainda."}</div>`;
-      return;
-    }
-
-    container.innerHTML = "";
-    lista.forEach(c => {
-      const nt = contarTermos(c.termos);
-      let sev = "";
-      if (c.oculto) sev = "sev-oculto";
-      else if (nt >= 3) sev = "sev-danger";
-      else if (nt >= 1) sev = "sev-warn";
-
-      /* Badges */
-      let badges = "";
-      if (c.termos) badges += `<span class="badge badge-flag">⚠️ ${nt} termo${nt > 1 ? "s" : ""}</span>`;
-      if (c.oculto) badges += `<span class="badge badge-oculto">🚫 Oculto</span>`;
-      if (!c.termos && !c.oculto) badges += `<span class="badge badge-ok">✓ OK</span>`;
-
-      /* IP duplicado */
-      const ipCount = c.ip ? (contadorIP[c.ip] || 0) : 0;
-      const btnIP = ipCount > 1
-        ? `<button class="btn-ip" data-ip="${esc(c.ip)}" title="Ocultar todos os ${ipCount} correios deste IP">🌐 IP ×${ipCount}</button>`
-        : "";
-
-      /* Botão principal */
-      const btnLabel = c.oculto ? "Mostrar" : "Ocultar";
-      const btnCls = c.oculto ? "btn sm verde" : "btn sm danger";
-
-      const el = document.createElement("div");
-      el.className = "item " + sev;
-      el.dataset.codigo = c.codigo;
-      el.innerHTML = `
-        <div class="item-top">
-          <div class="item-top-left">
-            <span class="cod">${esc(c.codigo)}</span>
-            ${badges}
-          </div>
-          <div class="item-top-right">
-            ${btnIP}
-            <button class="${btnCls} btn-toggle">${btnLabel}</button>
-          </div>
-        </div>
-        <div class="item-para">Para <b>${esc(c.para)}</b></div>
-        <div class="item-msg">"${esc(c.mensagem)}"</div>
-        <div class="item-meta">
-          <span>👤 Aparece como: <b>${esc(c.de)}</b></span>
-          <span>📡 via ${esc(c.via || "—")}</span>
-          <span>${c.entregue ? "✅ entregue" : "⏳ pendente"}</span>
-          ${c.quando ? `<span>🕐 ${esc(c.quando)}</span>` : ""}
-        </div>
-        <div class="item-quem">
-          👤 <b>${esc(c.remetente_real || "—")}</b>
-          &nbsp;·&nbsp; 🌐 IP: <b>${esc(c.ip || "—")}</b>
-        </div>
-        ${c.termos ? `<div class="item-terms">⚠️ Termos detectados: <b>${esc(c.termos)}</b></div>` : ""}
-      `;
-
-      /* Toggle ocultar/mostrar */
-      el.querySelector(".btn-toggle").onclick = () => toggle(c.codigo, !c.oculto, !!c.termos, c.oculto);
-
-      /* Ocultar por IP */
-      const btnIPel = el.querySelector(".btn-ip");
-      if (btnIPel) {
-        btnIPel.onclick = () => ocultarPorIP(c.ip);
-      }
-
-      container.appendChild(el);
-    });
-  }
-
-  /* ─── Toggle ocultar/mostrar ─── */
-  async function toggle(codigo, ocultar, temTermos, eraOculto) {
-    if (ocultar && !temTermos) {
-      const ok = await confirmar(
-        "Ocultar mensagem",
-        "Essa mensagem não foi sinalizada pelo filtro. Tem certeza que quer ocultá-la?"
-      );
-      if (!ok) return;
-    }
-    try {
-      const r = await fetch(`/api/admin/ocultar/${codigo}?key=${encodeURIComponent(KEY)}&ocultar=${ocultar}`, {method:"POST"});
-      if (!r.ok) { toast("Erro ao salvar ✗", "danger"); return; }
-      /* Atualiza localmente para resposta rápida */
-      const idx = todosCorreios.findIndex(c => c.codigo === codigo);
-      if (idx !== -1) todosCorreios[idx].oculto = ocultar;
-      atualizarStats(todosCorreios);
-      renderizar();
-      toast(ocultar ? "Correio ocultado ✓" : "Correio restaurado ✓", ocultar ? "danger" : "ok");
-    } catch(e) {
-      toast("Erro de rede ✗", "danger");
-    }
-  }
-
-  /* ─── Ocultar por IP ─── */
-  async function ocultarPorIP(ip) {
-    const afetados = todosCorreios.filter(c => c.ip === ip && !c.oculto);
-    if (!afetados.length) { toast("Nenhum visível deste IP", "ok"); return; }
-    const ok = await confirmar(
-      "Ocultar por IP",
-      `Isso vai ocultar ${afetados.length} correio${afetados.length > 1 ? "s" : ""} do IP ${ip}. Confirmar?`
-    );
-    if (!ok) return;
-    for (const c of afetados) {
-      await fetch(`/api/admin/ocultar/${c.codigo}?key=${encodeURIComponent(KEY)}&ocultar=true`, {method:"POST"});
-      const idx = todosCorreios.findIndex(x => x.codigo === c.codigo);
-      if (idx !== -1) todosCorreios[idx].oculto = true;
-    }
-    atualizarStats(todosCorreios);
+/* ── Carregar correios ── */
+async function carregar(){
+  try{
+    const r=await fetch('/api/admin/correios?key='+encodeURIComponent(chave));
+    if(r.status===403){chave='';try{localStorage.removeItem(DRAFT);}catch(_){} location.reload();return;}
+    todos=await r.json();
+    atualizarStats();
     renderizar();
-    toast(`${afetados.length} correio${afetados.length > 1 ? "s" : ""} ocultado${afetados.length > 1 ? "s" : ""} ✓`, "danger");
-  }
+  }catch(e){toast('Erro ao carregar: '+e.message,'err');}
+}
 
-  /* ─── Busca / ordenação em tempo real ─── */
-  $("busca").addEventListener("input", renderizar);
-  $("ordenar").addEventListener("change", renderizar);
+/* ── Stats ── */
+function atualizarStats(){
+  $('s-total').textContent=todos.length;
+  $('s-entregues').textContent=todos.filter(c=>c.entregue).length;
+  $('s-flagged').textContent=todos.filter(c=>c.termos&&!c.oculto).length;
+  $('s-ocultos').textContent=todos.filter(c=>c.oculto).length;
+}
 
-  /* ─── Atualizar manual ─── */
-  $("btn-refresh").onclick = () => carregar();
+/* ── Renderizar ── */
+function renderizar(){
+  const busca=$('busca').value.trim().toLowerCase();
+  const filtro=$('filtro').value;
+  const ordem=$('ordem').value;
 
-  /* ─── Auto-refresh ─── */
-  $("auto-refresh").addEventListener("change", function() {
-    if (this.checked) {
-      autoTimer = setInterval(() => carregar(), 30000);
-    } else {
-      clearInterval(autoTimer);
-      autoTimer = null;
-    }
+  let lista=todos.filter(c=>{
+    const match=!busca||c.para.toLowerCase().includes(busca)||c.mensagem.toLowerCase().includes(busca)||c.de.toLowerCase().includes(busca)||(c.remetente_real||'').toLowerCase().includes(busca);
+    if(!match)return false;
+    if(filtro==='retidos')return c.termos&&!c.oculto;
+    if(filtro==='ocultos')return c.oculto;
+    if(filtro==='visiveis')return!c.oculto;
+    return true;
   });
 
-  /* ─── Export CSV ─── */
-  $("btn-export").onclick = () => {
-    if (!todosCorreios.length) { toast("Nenhum dado para exportar", "danger"); return; }
-    const cols = ["codigo","para","mensagem","de","remetente_real","ip","via","entregue","oculto","termos","quando"];
-    const header = cols.join(",");
-    const rows = todosCorreios.map(c =>
-      cols.map(k => {
-        const v = String(c[k] === undefined || c[k] === null ? "" : c[k]);
-        return '"' + v.replace(/"/g, '""') + '"';
-      }).join(",")
-    );
-    const csv = [header, ...rows].join("\r\n");
-    const blob = new Blob(["﻿" + csv], {type:"text/csv;charset=utf-8;"});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "correios_" + new Date().toISOString().slice(0,10) + ".csv";
-    a.click();
-    URL.revokeObjectURL(url);
-    toast("CSV exportado ✓", "ok");
-  };
-})();
+  if(ordem==='antigo')lista=lista.slice().reverse();
+  $('result-count').textContent=lista.length+' / '+todos.length;
+
+  const el=$('cards');
+  if(!lista.length){
+    el.innerHTML='<div class="empty"><span>🔍</span>Nenhum resultado.</div>';return;
+  }
+
+  el.innerHTML='';
+  lista.forEach(c=>el.appendChild(buildCard(c)));
+}
+
+function esc(s){return(s||'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
+
+function buildCard(c){
+  const div=document.createElement('div');
+  const hasTags=c.termos&&c.termos.trim();
+  div.className='msg-card'+(c.oculto?' hidden':'')+(hasTags?' '+(c.oculto?'severe':'flagged'):'');
+
+  let tagsHtml='<span class="tag '+(c.via==='telegram'?'tg':'lk')+'">'+(c.via==='telegram'?'TELEGRAM':'QR/LINK')+'</span>';
+  if(c.oculto)tagsHtml+='<span class="tag oculto">OCULTO</span>';
+  else tagsHtml+='<span class="tag visivel">VISÍVEL</span>';
+  if(hasTags&&!c.oculto)tagsHtml+='<span class="tag mod">RETIDO</span>';
+
+  div.innerHTML=
+    '<div class="card-head">'+
+      '<span class="card-cod">'+esc(c.codigo)+'</span>'+
+      '<div style="flex:1;min-width:0">'+
+        '<div class="card-para">Para: '+esc(c.para)+'</div>'+
+        '<div class="card-de">De: '+esc(c.de)+'</div>'+
+      '</div>'+
+      '<div class="card-tags">'+tagsHtml+'</div>'+
+    '</div>'+
+    '<div class="card-msg">'+esc(c.mensagem)+'</div>'+
+    (hasTags?'<div class="flag-terms">⚠️ Termos detectados: '+esc(c.termos)+'</div>':'')+
+    (c.remetente_real?'<div class="remetente-real">👤 Remetente real: <b>'+esc(c.remetente_real)+'</b></div>':'')+
+    '<div class="card-meta">'+
+      '<div class="card-info">'+
+        (c.ip?'IP: <b>'+esc(c.ip)+'</b> · ':'')+
+        'Enviado: <b>'+(c.quando||'—')+'</b>'+
+      '</div>'+
+      '<div class="card-actions">'+
+        '<button class="act-btn '+(c.oculto?'show-btn':'hide-btn')+'" data-cod="'+esc(c.codigo)+'" data-ocultar="'+(c.oculto?'false':'true')+'">'+
+          (c.oculto?'✅ Mostrar':'🚫 Ocultar')+
+        '</button>'+
+      '</div>'+
+    '</div>';
+
+  div.querySelector('.act-btn').addEventListener('click',async function(){
+    const cod=this.dataset.cod;
+    const ocultar=this.dataset.ocultar==='true';
+    const acao=ocultar?'Ocultar':'Mostrar';
+    confirmar(acao+' correio',acao+' o correio "'+cod+'"?',async()=>{
+      this.disabled=true;
+      try{
+        const r=await fetch('/api/admin/ocultar/'+encodeURIComponent(cod)+'?key='+encodeURIComponent(chave)+'&ocultar='+ocultar,{method:'POST'});
+        if(!r.ok)throw new Error(await r.text());
+        toast(acao+' aplicado: '+cod,'ok');
+        await carregar();
+      }catch(e){toast('Erro: '+e.message,'err');this.disabled=false;}
+    });
+  });
+
+  return div;
+}
+
+/* ── Filtros / busca ── */
+$('busca').addEventListener('input',renderizar);
+$('filtro').addEventListener('change',renderizar);
+$('ordem').addEventListener('change',renderizar);
+
+/* ── Auto-refresh ── */
+$('auto-btn').onclick=function(){
+  if(autoId){clearInterval(autoId);autoId=null;this.classList.remove('on');this.textContent='⟳ Auto 30s';}
+  else{autoId=setInterval(carregar,30000);this.classList.add('on');this.textContent='✅ Auto 30s';}
+};
+
+/* ── Export CSV ── */
+$('exportar-btn').onclick=()=>{
+  if(!todos.length){toast('Nada para exportar','err');return;}
+  const h=['Código','Para','De','Mensagem','Via','Entregue','Oculto','Termos','IP','Remetente Real','Data'];
+  const rows=todos.map(c=>[
+    c.codigo,c.para,c.de,'"'+(c.mensagem||'').replace(/"/g,'""')+'"',
+    c.via,c.entregue?'Sim':'Não',c.oculto?'Sim':'Não',
+    c.termos||'',c.ip||'',c.remetente_real||'',c.quando||''
+  ].join(','));
+  const blob=new Blob([[h.join(','),...rows].join('\n')],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='correios-'+new Date().toISOString().slice(0,10)+'.csv';a.click();
+  toast('CSV exportado!','ok');
+};
 </script>
 </body></html>

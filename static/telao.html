@@ -4,544 +4,522 @@
 <link rel="manifest" href="/static/manifest.json" />
 <title>Telão · Correio Elegante</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Rye&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
 <style>
-  :root{
-    --noite:#15173a;--kraft:#f3e7cf;--fogueira:#ff7a2d;--brasa:#ff3d3d;
-    --milho:#ffc83d;--verde:#3ec46d;--azul:#43b3ff;--rosa:#ff6fae
-  }
-  *{box-sizing:border-box}
-  html,body{margin:0;min-height:100vh}
+:root{
+  --bg:#060612;--card:rgba(255,255,255,.05);--card2:rgba(255,255,255,.03);
+  --border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.14);
+  --pink:#ff6b9d;--gold:#ffd700;--teal:#00e5ff;--purple:#c44dff;--green:#3ec46d;
+  --text:#f0f0f8;--muted:#8888aa;
+  --grad:linear-gradient(135deg,#ff6b9d,#c44dff,#00e5ff)
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{
+  font-family:'Outfit',system-ui,sans-serif;color:var(--text);
+  background:var(--bg);min-height:100vh;
+  display:flex;flex-direction:column
+}
 
-  /* Fundo com gradiente animado suave */
-  body{
-    font-family:"Outfit",system-ui,sans-serif;color:var(--kraft);padding:22px;
-    background:var(--noite);
-    animation:bgshift 18s ease-in-out infinite alternate
-  }
-  @keyframes bgshift{
-    0%{background:
-      radial-gradient(1000px 500px at 50% -10%,#2a2c66 0,transparent 60%),
-      radial-gradient(800px 400px at 50% 120%,#3a1230 0,transparent 60%),
-      #15173a}
-    33%{background:
-      radial-gradient(1000px 500px at 30% -10%,#1e2c60 0,transparent 60%),
-      radial-gradient(800px 400px at 70% 120%,#2a0d28 0,transparent 60%),
-      #14163a}
-    66%{background:
-      radial-gradient(1000px 500px at 70% -10%,#2d1f5e 0,transparent 60%),
-      radial-gradient(800px 400px at 30% 110%,#400d1a 0,transparent 60%),
-      #16183c}
-    100%{background:
-      radial-gradient(1000px 500px at 50% -10%,#2a2c66 0,transparent 60%),
-      radial-gradient(900px 400px at 60% 130%,#3a1230 0,transparent 60%),
-      #15173a}
-  }
+/* Animated bg glow */
+.bg-glow{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 900px 600px at 20% -10%,rgba(196,77,255,.12) 0,transparent 70%),
+    radial-gradient(ellipse 800px 500px at 80% 110%,rgba(255,107,157,.12) 0,transparent 70%),
+    radial-gradient(ellipse 700px 400px at 50% 50%,rgba(0,229,255,.06) 0,transparent 70%),
+    var(--bg)
+}
 
-  /* Bandeirinhas */
-  .bandeirinhas{height:24px;display:flex;overflow:hidden;animation:balanca 3s ease-in-out infinite}
-  .bandeirinhas i{flex:1 0 24px;height:24px;clip-path:polygon(0 0,100% 0,50% 100%)}
-  .bandeirinhas i:nth-child(5n+1){background:var(--brasa)}
-  .bandeirinhas i:nth-child(5n+2){background:var(--milho)}
-  .bandeirinhas i:nth-child(5n+3){background:var(--verde)}
-  .bandeirinhas i:nth-child(5n+4){background:var(--azul)}
-  .bandeirinhas i:nth-child(5n+5){background:var(--rosa)}
-  @keyframes balanca{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
+/* Bandeirinhas no topo */
+.band{height:18px;display:flex;overflow:hidden;flex-shrink:0;position:relative;z-index:10}
+.band i{flex:1 0 18px;height:18px;clip-path:polygon(0 0,100% 0,50% 100%)}
+.band i:nth-child(5n+1){background:#ff3d3d}
+.band i:nth-child(5n+2){background:#ffc83d}
+.band i:nth-child(5n+3){background:#3ec46d}
+.band i:nth-child(5n+4){background:#43b3ff}
+.band i:nth-child(5n+5){background:#ff6fae}
 
-  /* Header */
-  .header-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:0}
-  h1{
-    font-family:"Rye",serif;color:var(--milho);font-weight:400;
-    text-align:center;font-size:40px;margin:20px 0 24px;flex:1;
-    text-shadow:0 3px 0 #b8431b,0 0 30px rgba(255,122,45,.4)
-  }
+/* ── Header ── */
+.header{
+  position:relative;z-index:10;
+  padding:16px 24px 14px;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  flex-shrink:0;
+  border-bottom:1px solid var(--border)
+}
+.logo{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(1.1rem,2.5vw,1.7rem);font-weight:900;
+  background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;white-space:nowrap
+}
+.header-right{display:flex;align-items:center;gap:14px}
+.relogio{
+  font-size:clamp(.85rem,1.8vw,1.2rem);font-weight:700;font-variant-numeric:tabular-nums;
+  color:var(--gold);text-shadow:0 0 12px rgba(255,215,0,.4);letter-spacing:1px
+}
+.sse-pill{
+  display:flex;align-items:center;gap:6px;
+  font-size:11px;font-weight:700;letter-spacing:.5px;
+  padding:5px 12px;border-radius:20px;
+  background:rgba(255,255,255,.06);border:1px solid var(--border2);
+  transition:background .3s
+}
+.sse-dot{width:7px;height:7px;border-radius:50%;background:#666;transition:background .3s}
+.sse-pill.ok .sse-dot{background:var(--green);animation:blink .8s ease-in-out infinite alternate}
+@keyframes blink{from{opacity:.6}to{opacity:1}}
+.mute-btn{
+  background:var(--card);border:1px solid var(--border2);color:var(--text);
+  border-radius:10px;padding:6px 10px;cursor:pointer;font-size:18px;
+  transition:background .15s,transform .1s;line-height:1
+}
+.mute-btn:hover{background:rgba(255,255,255,.12);transform:scale(1.05)}
 
-  /* Top right controls */
-  .top-right{
-    position:fixed;top:18px;right:18px;display:flex;align-items:center;gap:10px;z-index:50
-  }
-  .relogio{
-    font-family:"Rye",serif;font-size:22px;color:var(--milho);
-    text-shadow:0 0 12px rgba(255,200,61,.5);letter-spacing:1px
-  }
-  .sse-badge{
-    display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;
-    padding:5px 11px;border-radius:999px;background:rgba(255,255,255,.08);
-    border:1px solid rgba(255,255,255,.14);transition:background .3s
-  }
-  .sse-dot{width:8px;height:8px;border-radius:50%;background:var(--brasa)}
-  .sse-badge.conectado .sse-dot{background:var(--verde);animation:pulsar .8s ease-in-out infinite alternate}
-  @keyframes pulsar{from{opacity:.7}to{opacity:1}}
-  .mute-btn{
-    font-size:20px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);
-    border-radius:10px;padding:5px 9px;cursor:pointer;transition:background .15s;line-height:1
-  }
-  .mute-btn:hover{background:rgba(255,255,255,.18)}
+/* ── Main layout ── */
+.main{
+  position:relative;z-index:5;
+  flex:1;display:grid;
+  grid-template-columns:1fr 360px;
+  gap:0;overflow:hidden
+}
+@media(max-width:900px){
+  .main{grid-template-columns:1fr;grid-template-rows:1fr auto}
+}
 
-  /* Layout */
-  .grid{display:grid;grid-template-columns:1.3fr 1fr;gap:20px;max-width:1100px;margin:0 auto}
-  @media(max-width:780px){.grid{grid-template-columns:1fr}}
+/* ── Left column ── */
+.left-col{
+  display:flex;flex-direction:column;gap:0;
+  padding:20px;overflow:hidden
+}
 
-  /* KPI placar */
-  .placar{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
-  .kpi{
-    background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
-    border-radius:16px;padding:18px;text-align:center;transition:transform .2s
-  }
-  .kpi:hover{transform:translateY(-2px)}
-  .kpi .n{
-    font-family:"Rye",serif;font-size:48px;color:#fff;line-height:1;
-    transition:transform .15s
-  }
-  .kpi.rosa .n{color:var(--rosa);text-shadow:0 0 22px rgba(255,111,174,.6)}
-  .kpi .l{margin-top:8px;font-size:13px;text-transform:uppercase;letter-spacing:1px;opacity:.8}
+/* KPIs */
+.kpi-row{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:14px;
+  margin-bottom:18px;flex-shrink:0
+}
+.kpi{
+  background:var(--card);border:1px solid var(--border);border-radius:16px;
+  padding:16px;text-align:center;
+  transition:transform .2s,border-color .3s
+}
+.kpi:hover{transform:translateY(-3px)}
+.kpi-num{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(2rem,5vw,3.5rem);font-weight:900;line-height:1;
+  transition:transform .15s
+}
+.kpi-num.bump{animation:bump .3s cubic-bezier(.3,0,.2,1.6)}
+@keyframes bump{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+.kpi-lbl{
+  font-size:11px;text-transform:uppercase;letter-spacing:1px;
+  color:var(--muted);margin-top:8px
+}
+.kpi:nth-child(1) .kpi-num{color:var(--pink);text-shadow:0 0 20px rgba(255,107,157,.5)}
+.kpi:nth-child(2) .kpi-num{color:var(--gold);text-shadow:0 0 20px rgba(255,215,0,.4)}
+.kpi:nth-child(3) .kpi-num{color:var(--teal);text-shadow:0 0 20px rgba(0,229,255,.4)}
+.kpi:nth-child(1){border-color:rgba(255,107,157,.2)}
+.kpi:nth-child(2){border-color:rgba(255,215,0,.2)}
+.kpi:nth-child(3){border-color:rgba(0,229,255,.2)}
 
-  /* Bloco */
-  .bloco{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:20px}
-  .bloco h2{margin:0 0 14px;font-size:16px;text-transform:uppercase;letter-spacing:1px;opacity:.85}
+/* Feed */
+.feed-card{
+  flex:1;background:var(--card);border:1px solid var(--border);
+  border-radius:18px;overflow:hidden;display:flex;flex-direction:column
+}
+.feed-header{
+  padding:14px 18px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:8px;flex-shrink:0
+}
+.feed-header h2{font-size:.9rem;text-transform:uppercase;letter-spacing:1px;opacity:.8;flex:1}
+.feed-count{font-size:11px;color:var(--muted)}
+.feed-list{
+  flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:6px;
+  scroll-behavior:smooth
+}
+.feed-list::-webkit-scrollbar{width:4px}
+.feed-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:2px}
 
-  /* Feed */
-  .feed{display:flex;flex-direction:column;gap:10px;max-height:54vh;overflow:auto;scroll-behavior:smooth}
-  .feed::-webkit-scrollbar{width:4px}
-  .feed::-webkit-scrollbar-track{background:transparent}
-  .feed::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2);border-radius:2px}
-  .ev{
-    display:flex;align-items:center;gap:12px;background:rgba(0,0,0,.18);
-    border-radius:12px;padding:12px 14px;transition:background .2s
-  }
-  .ev.novo-item{animation:slideRight .4s cubic-bezier(.22,1,.36,1)}
-  @keyframes slideRight{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:translateX(0)}}
-  .ev:hover{background:rgba(0,0,0,.28)}
-  .ev .ico{font-size:22px}
-  .ev b{font-size:16px}
-  .ev small{opacity:.7}
-  .ev .tag{margin-left:auto;font-size:11px;font-weight:800;padding:4px 10px;border-radius:999px;white-space:nowrap}
-  .tag.tg{background:#1d6fd1;color:#fff}
-  .tag.lk{background:var(--milho);color:#3a2c00}
-  .ev .tempo{font-size:11px;opacity:.55;margin-top:2px}
-  .vazio{opacity:.6;text-align:center;padding:24px}
+.feed-item{
+  display:flex;align-items:center;gap:12px;
+  background:rgba(0,0,0,.25);border:1px solid var(--border);
+  border-radius:12px;padding:11px 14px;
+  transition:background .2s,border-color .2s
+}
+.feed-item:hover{background:rgba(255,255,255,.04);border-color:var(--border2)}
+.feed-item.novo{animation:slideIn .45s cubic-bezier(.22,1,.36,1)}
+@keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
+.fi-ico{font-size:20px;flex-shrink:0}
+.fi-body{flex:1;min-width:0}
+.fi-para{font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fi-tempo{font-size:11px;color:var(--muted);margin-top:2px}
+.fi-tag{
+  flex-shrink:0;font-size:10px;font-weight:800;
+  padding:4px 10px;border-radius:20px;letter-spacing:.5px;white-space:nowrap
+}
+.fi-tag.tg{background:rgba(29,111,209,.4);color:#7ec8ff;border:1px solid rgba(29,111,209,.4)}
+.fi-tag.lk{background:rgba(255,200,61,.15);color:var(--gold);border:1px solid rgba(255,200,61,.25)}
 
-  /* QR Ativar — maior e mais bonito */
-  .ativar{text-align:center}
-  .ativar h2{margin:0 0 16px}
-  .qrwrap{
-    display:inline-block;padding:16px;border-radius:20px;background:#fff;
-    margin:8px 0 16px;
-    box-shadow:0 0 0 4px var(--rosa),0 0 0 8px rgba(255,111,174,.25);
-    animation:qrpulse 2.5s ease-in-out infinite
-  }
-  @keyframes qrpulse{
-    0%,100%{box-shadow:0 0 0 4px var(--rosa),0 0 0 8px rgba(255,111,174,.25)}
-    50%{box-shadow:0 0 0 6px var(--rosa),0 0 0 14px rgba(255,111,174,.12)}
-  }
-  .botname-destaque{
-    font-family:"Rye",serif;font-size:22px;color:var(--milho);
-    text-shadow:0 0 14px rgba(255,200,61,.4);margin:0 0 8px
-  }
-  .ativar p{font-size:15px;opacity:.9;margin:4px 0}
-  .ativar .passo{font-family:"Rye",serif;color:var(--milho);font-size:20px;margin-top:8px}
-  .ativar .bot-sub{opacity:.55;font-size:13px}
+.feed-empty{text-align:center;color:var(--muted);padding:40px 20px;font-size:.95rem}
+.feed-empty span{font-size:2.5rem;display:block;margin-bottom:10px}
 
-  /* Flash de novo correio */
-  #tflash{
-    position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;
-    background:radial-gradient(circle,#5a1140,#180312);text-align:center;padding:24px;overflow:hidden
-  }
-  #tflash.show{display:flex;animation:tfin .3s ease}
-  @keyframes tfin{from{opacity:0}to{opacity:1}}
-  #tflash .t{font-family:"Rye",serif;color:#ff9ec7;font-size:30px}
-  #tflash .nome{
-    font-family:"Rye",serif;color:#fff;font-size:64px;margin:10px 0;
-    text-shadow:0 0 30px rgba(255,111,174,.6);animation:pop .5s ease
-  }
-  @media(max-width:640px){#tflash .nome{font-size:42px}}
-  @keyframes pop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
-  #tflash .s{color:var(--kraft);font-size:22px;opacity:.9}
-  #tflash .cor{position:absolute;bottom:-40px;animation:up 3.4s ease-in forwards}
-  @keyframes up{to{transform:translateY(-110vh) rotate(18deg);opacity:0}}
+/* ── Right column: QR panel ── */
+.right-col{
+  background:var(--card2);border-left:1px solid var(--border);
+  display:flex;flex-direction:column;align-items:center;
+  padding:24px 20px;text-align:center;overflow-y:auto
+}
+.qr-title{
+  font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;
+  color:#fff;margin-bottom:4px
+}
+.qr-sub{font-size:.8rem;color:var(--muted);margin-bottom:20px;line-height:1.5}
 
-  /* Flash de marco (milestone) */
-  #marco-flash{
-    position:fixed;inset:0;z-index:90;display:none;align-items:center;justify-content:center;
-    background:rgba(0,0,0,.75);text-align:center;padding:24px
-  }
-  #marco-flash.show{display:flex;animation:tfin .4s ease}
-  #marco-flash .marco-inner{
-    background:linear-gradient(135deg,#2d0b3f,#3a1230);
-    border:3px solid var(--milho);border-radius:28px;padding:44px 56px;
-    box-shadow:0 0 60px rgba(255,200,61,.35)
-  }
-  #marco-flash .marco-num{font-family:"Rye",serif;font-size:80px;color:var(--milho);line-height:1}
-  #marco-flash .marco-txt{font-family:"Rye",serif;font-size:28px;color:var(--kraft);margin-top:8px}
+.qr-frame{
+  display:inline-block;padding:16px;border-radius:20px;background:#fff;
+  box-shadow:0 0 0 3px var(--pink),0 0 0 7px rgba(255,107,157,.2),0 20px 50px rgba(0,0,0,.5);
+  animation:qrpulse 3s ease-in-out infinite;margin-bottom:20px
+}
+@keyframes qrpulse{
+  0%,100%{box-shadow:0 0 0 3px var(--pink),0 0 0 7px rgba(255,107,157,.2),0 20px 50px rgba(0,0,0,.5)}
+  50%{box-shadow:0 0 0 5px var(--pink),0 0 0 12px rgba(255,107,157,.1),0 20px 50px rgba(0,0,0,.5)}
+}
 
-  /* Confetti canvas */
-  #confetti-canvas{position:fixed;inset:0;pointer-events:none;z-index:9999;width:100%;height:100%}
+.bot-name{
+  font-size:1rem;font-weight:800;color:var(--gold);margin-bottom:6px;
+  text-shadow:0 0 14px rgba(255,215,0,.4)
+}
+.qr-steps{display:flex;flex-direction:column;gap:8px;margin-top:8px;text-align:left}
+.qr-step{
+  display:flex;align-items:center;gap:10px;
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+  border-radius:12px;padding:10px 14px;font-size:.82rem
+}
+.step-num{
+  width:24px;height:24px;border-radius:50%;flex-shrink:0;
+  background:var(--grad);display:grid;place-items:center;
+  font-size:12px;font-weight:800;color:#fff
+}
+
+/* ── Flash novo correio ── */
+#flash{
+  position:fixed;inset:0;z-index:200;
+  display:none;align-items:center;justify-content:center;
+  background:radial-gradient(circle,rgba(90,12,60,.97),rgba(15,5,25,.98));
+  text-align:center;padding:24px;overflow:hidden
+}
+#flash.on{display:flex;animation:fin .3s ease}
+@keyframes fin{from{opacity:0}to{opacity:1}}
+.flash-sup{font-size:clamp(.9rem,2vw,1.2rem);color:var(--pink);letter-spacing:1px;margin-bottom:8px}
+.flash-nome{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(3rem,10vw,7rem);font-weight:900;
+  color:#fff;line-height:1;margin:10px 0;
+  text-shadow:0 0 40px rgba(255,107,157,.7);
+  animation:pop .5s cubic-bezier(.3,0,.2,1.6)
+}
+@keyframes pop{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
+.flash-sub{font-size:clamp(.8rem,2vw,1.1rem);color:rgba(240,240,248,.8)}
+.flash-emoji{
+  position:absolute;pointer-events:none;
+  animation:floatUp 3.4s ease-in forwards
+}
+@keyframes floatUp{to{transform:translateY(-115vh) rotate(20deg);opacity:0}}
+
+/* ── Marco milestone ── */
+#marco{
+  position:fixed;inset:0;z-index:190;
+  display:none;align-items:center;justify-content:center;
+  background:rgba(0,0,0,.8);
+}
+#marco.on{display:flex;animation:fin .4s ease}
+.marco-card{
+  background:linear-gradient(135deg,#1a0830,#2a1050);
+  border:3px solid var(--gold);border-radius:28px;padding:48px 60px;text-align:center;
+  box-shadow:0 0 80px rgba(255,215,0,.3)
+}
+.marco-num{
+  font-family:'Playfair Display',serif;font-size:clamp(4rem,12vw,8rem);
+  color:var(--gold);font-weight:900;line-height:1;
+  text-shadow:0 0 40px rgba(255,215,0,.6)
+}
+.marco-txt{font-size:clamp(1.1rem,3vw,1.8rem);color:var(--text);margin-top:8px;font-weight:600}
+
+/* ── Confetti ── */
+#cc{position:fixed;inset:0;pointer-events:none;z-index:999;display:none}
 </style>
-</head><body>
-<canvas id="confetti-canvas"></canvas>
-<div id="tflash"></div>
-<div id="marco-flash"><div class="marco-inner"><div class="marco-num" id="marco-n">10</div><div class="marco-txt">🎉 Correios enviados!</div></div></div>
+</head>
+<body>
+<div class="bg-glow"></div>
+<canvas id="cc"></canvas>
+<div id="flash"></div>
+<div id="marco"><div class="marco-card">
+  <div class="marco-num" id="marco-n">10</div>
+  <div class="marco-txt">🎉 correios enviados!</div>
+</div></div>
 
-<div class="top-right">
-  <div class="sse-badge" id="sse-badge">
-    <span class="sse-dot"></span>
-    <span id="sse-txt">conectando…</span>
+<div class="band" id="band"></div>
+
+<div class="header">
+  <div class="logo">💌 Correio Elegante · Arraiá TI</div>
+  <div class="header-right">
+    <div class="sse-pill" id="sse"><span class="sse-dot" id="ssedot"></span><span id="ssetxt">conectando…</span></div>
+    <button class="mute-btn" id="mute-btn" title="Som">🔔</button>
+    <div class="relogio" id="relogio">00:00:00</div>
   </div>
-  <button class="mute-btn" id="mute-btn" title="Silenciar/Ativar som">🔔</button>
-  <div class="relogio" id="relogio">00:00:00</div>
 </div>
 
-<div class="bandeirinhas" id="band"></div>
-<h1>💌 Correio Elegante do Arraiá</h1>
-
-<div class="grid">
-  <div>
-    <div class="placar">
-      <div class="kpi rosa"><div class="n" id="k-total">0</div><div class="l">Correios</div></div>
-      <div class="kpi"><div class="n" id="k-entregues">0</div><div class="l">Entregues</div></div>
-      <div class="kpi"><div class="n" id="k-reg">0</div><div class="l">No Telegram</div></div>
+<div class="main">
+  <div class="left-col">
+    <div class="kpi-row">
+      <div class="kpi"><div class="kpi-num" id="k-total">0</div><div class="kpi-lbl">💌 Correios</div></div>
+      <div class="kpi"><div class="kpi-num" id="k-entregues">0</div><div class="kpi-lbl">✅ Entregues</div></div>
+      <div class="kpi"><div class="kpi-num" id="k-reg">0</div><div class="kpi-lbl">📲 Telegram</div></div>
     </div>
-    <div class="bloco">
-      <h2>📡 Chegando agora</h2>
-      <div class="feed" id="feed"><div class="vazio">Esperando o primeiro correio… 💕</div></div>
+    <div class="feed-card">
+      <div class="feed-header">
+        <h2>📡 Chegando agora</h2>
+        <span class="feed-count" id="feed-count"></span>
+      </div>
+      <div class="feed-list" id="feed">
+        <div class="feed-empty"><span>💕</span>Esperando o primeiro correio da noite…</div>
+      </div>
     </div>
   </div>
 
-  <div class="bloco ativar">
-    <h2>📲 Ative seu correio</h2>
-    <div class="qrwrap"><div id="qr-bot"></div></div>
-    <div class="botname-destaque" id="botname-destaque" style="display:none"></div>
-    <p class="passo">Escaneie e dê /start</p>
-    <p>Assim o correio chega <b>direto no seu celular</b> pelo Telegram!</p>
-    <p class="bot-sub" id="botname"></p>
+  <div class="right-col">
+    <div class="qr-title">Ative seu correio!</div>
+    <div class="qr-sub">Escaneie para receber<br>direto no Telegram 🎉</div>
+    <div class="qr-frame"><div id="qr-bot"></div></div>
+    <div class="bot-name" id="botname"></div>
+    <div class="qr-steps">
+      <div class="qr-step"><div class="step-num">1</div><span>Abra a câmera e escaneie o QR</span></div>
+      <div class="qr-step"><div class="step-num">2</div><span>Toque em <b>START</b> no Telegram</span></div>
+      <div class="qr-step"><div class="step-num">3</div><span>Diga seu nome / codinome</span></div>
+    </div>
   </div>
 </div>
 
 <script>
-// ── Bandeirinhas ──────────────────────────────────────────────────────────────
-const band = document.getElementById("band");
-for (let i = 0; i < 40; i++) band.appendChild(document.createElement("i"));
-const $ = id => document.getElementById(id);
+const $=id=>document.getElementById(id);
 
-// ── Relógio ───────────────────────────────────────────────────────────────────
-function atualizarRelogio() {
-  const now = new Date();
-  const h = String(now.getHours()).padStart(2, "0");
-  const m = String(now.getMinutes()).padStart(2, "0");
-  const s = String(now.getSeconds()).padStart(2, "0");
-  $("relogio").textContent = h + ":" + m + ":" + s;
+/* Bandeirinhas */
+const band=$('band');for(let i=0;i<50;i++)band.appendChild(document.createElement('i'));
+
+/* Relógio */
+function tick(){
+  const n=new Date();
+  const p=v=>String(v).padStart(2,'0');
+  $('relogio').textContent=p(n.getHours())+':'+p(n.getMinutes())+':'+p(n.getSeconds());
 }
-atualizarRelogio();
-setInterval(atualizarRelogio, 1000);
+tick();setInterval(tick,1000);
 
-// ── Som (Web Audio API) ───────────────────────────────────────────────────────
-let mutado = false;
-let audioCtx = null;
-
-function tocarChime() {
-  if (mutado) return;
-  try {
-    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const ctx = audioCtx;
-    // Sequência de notas — C5, E5, G5 (triade maior)
-    const notas = [523.25, 659.25, 783.99];
-    notas.forEach((freq, i) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.type = "sine";
-      osc.frequency.value = freq;
-      const t = ctx.currentTime + i * 0.18;
-      gain.gain.setValueAtTime(0, t);
-      gain.gain.linearRampToValueAtTime(0.22, t + 0.04);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.55);
-      osc.start(t);
-      osc.stop(t + 0.6);
+/* Som */
+let mutado=false,audioCtx=null;
+function tocarChime(){
+  if(mutado)return;
+  try{
+    if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+    [[523.25,0],[659.25,.2],[783.99,.4],[1046.5,.6]].forEach(([f,d])=>{
+      const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+      o.type='sine';o.frequency.value=f;
+      const t=audioCtx.currentTime+d;
+      g.gain.setValueAtTime(0,t);
+      g.gain.linearRampToValueAtTime(.25,t+.04);
+      g.gain.exponentialRampToValueAtTime(.001,t+.6);
+      o.connect(g);g.connect(audioCtx.destination);
+      o.start(t);o.stop(t+.7);
     });
-  } catch (_) {}
+  }catch(e){}
 }
-
-$("mute-btn").onclick = () => {
-  mutado = !mutado;
-  $("mute-btn").textContent = mutado ? "🔕" : "🔔";
-  // Inicializa AudioContext no primeiro clique (política do navegador)
-  if (!audioCtx) {
-    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch (_) {}
-  }
+$('mute-btn').onclick=()=>{
+  mutado=!mutado;$('mute-btn').textContent=mutado?'🔕':'🔔';
+  if(!audioCtx)try{audioCtx=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}
 };
 
-// ── SSE status ─────────────────────────────────────────────────────────────────
-function setSseStatus(status) {
-  const badge = $("sse-badge");
-  const txt = $("sse-txt");
-  if (status === "ok") {
-    badge.className = "sse-badge conectado";
-    txt.textContent = "conectado";
-  } else {
-    badge.className = "sse-badge";
-    txt.textContent = "reconectando…";
-  }
+/* SSE status */
+function setSse(ok){
+  const p=$('sse');
+  $('ssedot').style.background=ok?'var(--green)':'#666';
+  $('ssetxt').textContent=ok?'ao vivo':'reconectando…';
+  p.className='sse-pill'+(ok?' ok':'');
 }
 
-// ── Contador animado (rolling) ────────────────────────────────────────────────
-const kpiAtual = { total: 0, entregues: 0, reg: 0 };
-
-function animarContador(el, de, para, duracao) {
-  const inicio = performance.now();
-  const diff = para - de;
-  if (diff === 0) return;
-  function frame(agora) {
-    const t = Math.min((agora - inicio) / duracao, 1);
-    const ease = 1 - Math.pow(1 - t, 3); // easeOutCubic
-    el.textContent = Math.round(de + diff * ease);
-    if (t < 1) requestAnimationFrame(frame);
-    else el.textContent = para;
-  }
-  requestAnimationFrame(frame);
+/* KPIs animados */
+const kv={total:0,entregues:0,reg:0};
+function anim(el,to,dur){
+  const from=parseInt(el.textContent)||0;
+  if(from===to)return;
+  const t0=performance.now();
+  const r=n=>{
+    const t=Math.min((n-t0)/dur,1);
+    const e=1-Math.pow(1-t,3);
+    el.textContent=Math.round(from+(to-from)*e);
+    if(t<1)requestAnimationFrame(r);
+    else{el.textContent=to;el.classList.add('bump');setTimeout(()=>el.classList.remove('bump'),400);}
+  };
+  requestAnimationFrame(r);
+}
+function setKpi(d){
+  if(d.total!==kv.total){anim($('k-total'),d.total,700);kv.total=d.total;}
+  if(d.entregues!==kv.entregues){anim($('k-entregues'),d.entregues,700);kv.entregues=d.entregues;}
+  if(d.registrados!==kv.reg){anim($('k-reg'),d.registrados,700);kv.reg=d.registrados;}
 }
 
-function atualizarKpi(total, entregues, reg) {
-  animarContador($("k-total"), kpiAtual.total, total, 600);
-  animarContador($("k-entregues"), kpiAtual.entregues, entregues, 600);
-  animarContador($("k-reg"), kpiAtual.reg, reg, 600);
-  kpiAtual.total = total;
-  kpiAtual.entregues = entregues;
-  kpiAtual.reg = reg;
+/* Tempo relativo */
+function ago(iso){
+  if(!iso)return'';
+  const d=new Date(iso);if(isNaN(d))return'';
+  const s=Math.floor((Date.now()-d)/1000);
+  if(s<10)return'agora';if(s<60)return'há '+s+'s';
+  const m=Math.floor(s/60);if(m<60)return'há '+m+'min';
+  return'há '+Math.floor(m/60)+'h';
 }
+function esc(s){return(s||'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
 
-// ── Tempo relativo ────────────────────────────────────────────────────────────
-function tempoRelativo(isoStr) {
-  if (!isoStr) return "";
-  const d = new Date(isoStr);
-  if (isNaN(d)) return "";
-  const diff = Math.floor((Date.now() - d.getTime()) / 1000);
-  if (diff < 10) return "agora";
-  if (diff < 60) return "há " + diff + "s";
-  const m = Math.floor(diff / 60);
-  if (m < 60) return "há " + m + " min";
-  const h = Math.floor(m / 60);
-  return "há " + h + "h";
-}
-
-// ── Escape HTML ───────────────────────────────────────────────────────────────
-function esc(s) { return (s || "").replace(/[&<>"]/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[m])); }
-
-// ── Build item do feed ────────────────────────────────────────────────────────
-function buildItem(c, isNovo) {
-  const e = document.createElement("div");
-  e.className = "ev" + (isNovo ? " novo-item" : "");
-  const tg = c.via === "telegram";
-  const tempo = c.criado_em ? `<div class="tempo">${tempoRelativo(c.criado_em)}</div>` : `<small>código ${esc(c.codigo)}</small>`;
-  e.innerHTML = `
-    <span class="ico">💌</span>
-    <div style="flex:1;min-width:0">
-      <b>${esc(c.para)}</b><br>
-      ${tempo}
-    </div>
-    <span class="tag ${tg ? "tg" : "lk"}">${tg ? "TELEGRAM" : "QR / LINK"}</span>`;
-  return e;
-}
-
-// ── Atualizar feed ────────────────────────────────────────────────────────────
-let feedData = [];
-
-function renderFeed(lista, novoId) {
-  feedData = lista;
-  const feed = $("feed");
-  if (!lista.length) {
-    feed.innerHTML = '<div class="vazio">Esperando o primeiro correio… 💕</div>';
+/* Feed */
+let feedData=[];
+function renderFeed(lista,novoId){
+  feedData=lista;
+  const feed=$('feed');
+  $('feed-count').textContent=lista.length?lista.length+' correios':'';
+  if(!lista.length){
+    feed.innerHTML='<div class="feed-empty"><span>💕</span>Esperando o primeiro correio da noite…</div>';
     return;
   }
-  feed.innerHTML = "";
-  lista.forEach(c => {
-    const isNovo = novoId && (c.codigo === novoId || c.id === novoId);
-    feed.appendChild(buildItem(c, isNovo));
+  feed.innerHTML='';
+  lista.forEach(c=>{
+    const el=document.createElement('div');
+    const isNovo=novoId&&c.codigo===novoId;
+    el.className='feed-item'+(isNovo?' novo':'');
+    const tg=c.via==='telegram';
+    el.innerHTML=
+      '<span class="fi-ico">💌</span>'+
+      '<div class="fi-body">'+
+        '<div class="fi-para">'+esc(c.para)+'</div>'+
+        '<div class="fi-tempo">'+(c.criado_em?ago(c.criado_em):'código '+esc(c.codigo))+'</div>'+
+      '</div>'+
+      '<span class="fi-tag '+(tg?'tg':'lk')+'">'+(tg?'TELEGRAM':'QR/LINK')+'</span>';
+    feed.appendChild(el);
   });
-  if (novoId) {
-    // Scroll suave para o topo (mais novo)
-    feed.scrollTo({ top: 0, behavior: "smooth" });
+  if(novoId)feed.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* Fetch telão */
+function atualizar(novoId){
+  fetch('/api/telao').then(r=>r.json()).then(d=>{
+    setKpi(d);renderFeed(d.feed||[],novoId||null);
+  }).catch(()=>{});
+}
+
+/* Info bot */
+fetch('/api/info').then(r=>r.json()).then(d=>{
+  if(d.bot_username&&window.QRCode){
+    const lk='https://t.me/'+d.bot_username+'?start=festa';
+    new QRCode($('qr-bot'),{text:lk,width:200,height:200,correctLevel:QRCode.CorrectLevel.M});
+    $('botname').textContent='@'+d.bot_username;
+  }else{
+    $('qr-bot').innerHTML='<div style="width:200px;height:200px;display:grid;place-items:center;color:#666;font-size:.8rem;text-align:center;padding:20px">Configure o bot para ativar</div>';
   }
-}
+}).catch(()=>{});
 
-// ── Atualizar tudo via API ────────────────────────────────────────────────────
-function atualizar(novoId) {
-  fetch("/api/telao")
-    .then(r => r.json())
-    .then(d => {
-      atualizarKpi(d.total, d.entregues, d.registrados);
-      renderFeed(d.feed || [], novoId || null);
-    })
-    .catch(() => {});
-}
-
-// ── Info do bot ───────────────────────────────────────────────────────────────
-fetch("/api/info")
-  .then(r => r.json())
-  .then(d => {
-    if (d.bot_username && window.QRCode) {
-      const link = "https://t.me/" + d.bot_username + "?start=festa";
-      new QRCode($("qr-bot"), { text: link, width: 220, height: 220 });
-      $("botname").textContent = "@" + d.bot_username;
-      const dest = $("botname-destaque");
-      dest.textContent = "@" + d.bot_username;
-      dest.style.display = "block";
-    } else {
-      $("qr-bot").innerHTML = "";
-      $("botname").textContent = "(configure o bot p/ liberar o Telegram)";
-    }
-  })
-  .catch(() => {});
-
-// ── Flash de correio ──────────────────────────────────────────────────────────
+/* Flash correio */
 let flashT;
-function flashTelao(nome) {
-  const f = $("tflash");
-  f.className = "show";
-  f.innerHTML = `<div>
-    <div class="t">💌 Você recebeu um correio!</div>
-    <div class="nome">${esc(nome)}</div>
-    <div class="s">Procure seu código no telão e escaneie pra ler ❤️</div>
-  </div>`;
-  for (let i = 0; i < 14; i++) {
-    const h = document.createElement("span");
-    h.className = "cor";
-    h.textContent = ["❤️", "💕", "💌", "💖"][i % 4];
-    h.style.left = (Math.random() * 100) + "%";
-    h.style.fontSize = (22 + Math.random() * 26) + "px";
-    h.style.animationDelay = (Math.random() * 0.6) + "s";
-    f.appendChild(h);
+function flashCorreio(nome){
+  const f=$('flash');
+  f.innerHTML=
+    '<div style="position:relative;z-index:1">'+
+    '<div class="flash-sup">💌 Novo correio chegando para</div>'+
+    '<div class="flash-nome">'+esc(nome)+'</div>'+
+    '<div class="flash-sub">Acesse o link ou QR para ler sua mensagem ❤️</div>'+
+    '</div>';
+  const ems=['❤️','💕','💌','💖','🌸','🎉'];
+  for(let i=0;i<16;i++){
+    const s=document.createElement('span');
+    s.className='flash-emoji';
+    s.textContent=ems[i%ems.length];
+    s.style.left=Math.random()*100+'%';
+    s.style.bottom='-40px';
+    s.style.fontSize=(22+Math.random()*28)+'px';
+    s.style.animationDelay=Math.random()*.8+'s';
+    f.appendChild(s);
   }
+  f.className='on';
   clearTimeout(flashT);
-  flashT = setTimeout(() => { f.className = ""; }, 4000);
+  flashT=setTimeout(()=>{f.className='';},4200);
 }
 
-// ── Marco (milestone) ────────────────────────────────────────────────────────
+/* Marco milestone */
 let marcoT;
-function flashMarco(num) {
-  $("marco-n").textContent = num;
-  const f = $("marco-flash");
-  f.className = "show";
-  clearTimeout(marcoT);
-  marcoT = setTimeout(() => { f.className = ""; }, 3000);
+function flashMarco(n){
+  $('marco-n').textContent=n;
+  const m=$('marco');m.className='on';
+  clearTimeout(marcoT);marcoT=setTimeout(()=>{m.className='';},3200);
 }
 
-// ── Confetti ──────────────────────────────────────────────────────────────────
-(function() {
-  const canvas = document.getElementById("confetti-canvas");
-  const ctx = canvas.getContext("2d");
-  let particles = [];
-  let animFrame = null;
-  let running = false;
-  const COLORS = ["#ff6fae","#ffc83d","#3ec46d","#43b3ff","#ff7a2d","#ff3d3d","#a259ff","#fff"];
-
-  function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-  window.addEventListener("resize", resize);
-  resize();
-
-  function Particle() {
-    this.x = Math.random() * canvas.width;
-    this.y = -10;
-    this.r = 5 + Math.random() * 8;
-    this.color = COLORS[Math.floor(Math.random() * COLORS.length)];
-    this.vx = (Math.random() - 0.5) * 5;
-    this.vy = 3 + Math.random() * 5;
-    this.angle = Math.random() * Math.PI * 2;
-    this.spin = (Math.random() - 0.5) * 0.22;
-    this.shape = Math.random() > 0.4 ? "rect" : "circle";
-    this.alpha = 1;
+/* Confetti */
+(function(){
+  const cv=$('cc');
+  const c=cv.getContext('2d');
+  let ps=[],raf=null,run=false;
+  const C=['#ff6b9d','#ffd700','#c44dff','#00e5ff','#3ec46d','#fff','#ff9800','#ff5722'];
+  function resize(){cv.width=window.innerWidth;cv.height=window.innerHeight;}
+  window.addEventListener('resize',resize);resize();
+  function P(){
+    this.x=Math.random()*cv.width;this.y=-10;
+    this.r=5+Math.random()*8;this.col=C[Math.floor(Math.random()*C.length)];
+    this.vx=(Math.random()-.5)*5;this.vy=3+Math.random()*5;
+    this.a=Math.random()*Math.PI*2;this.sp=(Math.random()-.5)*.22;
+    this.sh=Math.random()>.45?'r':'c';this.al=1;
   }
-  Particle.prototype.update = function() {
-    this.x += this.vx;
-    this.y += this.vy;
-    this.angle += this.spin;
-    this.vy += 0.09;
-    if (this.y > canvas.height * 0.65) this.alpha -= 0.04;
+  P.prototype.tick=function(){
+    this.x+=this.vx;this.y+=this.vy;this.a+=this.sp;this.vy+=.09;
+    if(this.y>cv.height*.6)this.al-=.04;
   };
-  Particle.prototype.draw = function() {
-    ctx.save();
-    ctx.globalAlpha = Math.max(0, this.alpha);
-    ctx.translate(this.x, this.y);
-    ctx.rotate(this.angle);
-    ctx.fillStyle = this.color;
-    if (this.shape === "rect") {
-      ctx.fillRect(-this.r / 2, -this.r / 2, this.r, this.r * 0.45);
-    } else {
-      ctx.beginPath();
-      ctx.arc(0, 0, this.r / 2, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    ctx.restore();
+  P.prototype.draw=function(){
+    c.save();c.globalAlpha=Math.max(0,this.al);c.fillStyle=this.col;
+    c.translate(this.x,this.y);c.rotate(this.a);
+    if(this.sh==='r')c.fillRect(-this.r/2,-this.r/2,this.r,this.r*.45);
+    else{c.beginPath();c.arc(0,0,this.r/2,0,Math.PI*2);c.fill();}
+    c.restore();
   };
-
-  function loop() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    particles = particles.filter(p => p.alpha > 0);
-    particles.forEach(p => { p.update(); p.draw(); });
-    if (particles.length > 0) { animFrame = requestAnimationFrame(loop); }
-    else { running = false; cancelAnimationFrame(animFrame); }
+  function loop(){
+    c.clearRect(0,0,cv.width,cv.height);
+    ps=ps.filter(p=>p.al>0);ps.forEach(p=>{p.tick();p.draw();});
+    if(ps.length)raf=requestAnimationFrame(loop);
+    else{run=false;cancelAnimationFrame(raf);cv.style.display='none';}
   }
-
-  window.dispararConfetti = function(n) {
-    resize();
-    const count = n || 120;
-    for (let i = 0; i < count; i++) {
-      setTimeout(() => particles.push(new Particle()), Math.random() * 600);
-    }
-    if (!running) { running = true; loop(); }
+  window.dispararConfetti=function(n){
+    resize();cv.style.display='block';
+    for(let i=0;i<(n||120);i++)setTimeout(()=>ps.push(new P()),Math.random()*700);
+    if(!run){run=true;loop();}
   };
 })();
 
-// ── SSE ───────────────────────────────────────────────────────────────────────
-let ultimoTotal = 0;
-
-function conectarSSE() {
-  let es;
-  try { es = new EventSource("/api/stream"); } catch (_) { return; }
-
-  es.onopen = () => setSseStatus("ok");
-
-  es.onmessage = (e) => {
-    try {
-      const d = JSON.parse(e.data);
-      if (d && d.tipo === "novo") {
-        tocarChime();
-        flashTelao(d.para);
-        dispararConfetti(100);
+/* SSE */
+let ult=0;
+function conectarSSE(){
+  let es;try{es=new EventSource('/api/stream');}catch(_){return;}
+  es.onopen=()=>setSse(true);
+  es.onmessage=e=>{
+    try{
+      const d=JSON.parse(e.data);
+      if(d&&d.tipo==='novo'){
+        tocarChime();flashCorreio(d.para);dispararConfetti(100);
         atualizar(d.codigo);
-
-        // Marco a cada 10 correios
-        const novoTotal = kpiAtual.total + 1;
-        if (novoTotal > 0 && novoTotal % 10 === 0) {
-          setTimeout(() => flashMarco(novoTotal), 4200);
-          setTimeout(() => dispararConfetti(200), 4200);
-        }
+        const novo=kv.total+1;
+        if(novo>0&&novo%10===0)setTimeout(()=>{flashMarco(novo);dispararConfetti(200);},4500);
       }
-    } catch (_) {}
+    }catch(_){}
   };
-
-  es.onerror = () => {
-    setSseStatus("erro");
-    es.close();
-    setTimeout(conectarSSE, 5000);
-  };
+  es.onerror=()=>{setSse(false);es.close();setTimeout(conectarSSE,5000);};
 }
 
-conectarSSE();
-atualizar();
-setInterval(atualizar, 8000);
-
-// Atualiza tempos relativos no feed a cada 30 segundos
-setInterval(() => {
-  const feed = $("feed");
-  const items = feed.querySelectorAll(".ev");
-  items.forEach((el, i) => {
-    if (!feedData[i]) return;
-    const tempoEl = el.querySelector(".tempo");
-    if (tempoEl && feedData[i].criado_em) {
-      tempoEl.textContent = tempoRelativo(feedData[i].criado_em);
-    }
+atualizar();setInterval(atualizar,8000);conectarSSE();
+setInterval(()=>{
+  $('feed').querySelectorAll('.fi-tempo').forEach((el,i)=>{
+    if(feedData[i]&&feedData[i].criado_em)el.textContent=ago(feedData[i].criado_em);
   });
-}, 30000);
+},30000);
 </script>
 </body></html>
