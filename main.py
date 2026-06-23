@@ -133,33 +133,37 @@ async def tratar_update(upd: dict):
     texto    = (msg.get("text") or "").strip()
     username = (msg.get("from", {}).get("username") or "").strip()
 
-    with Session(engine) as s:
-        u = s.get(Usuario, chat_id)
+    try:
+        with Session(engine) as s:
+            u = s.get(Usuario, chat_id)
 
-        if texto.startswith("/start"):
-            if not u:
-                u = Usuario(chat_id=chat_id, username=username, aguardando_codinome=True)
-                s.add(u)
-            else:
+            if texto.startswith("/start"):
+                if not u:
+                    u = Usuario(chat_id=chat_id, username=username, aguardando_codinome=True)
+                    s.add(u)
+                else:
+                    u.username = username or u.username
+                    u.aguardando_codinome = True
+                s.commit()
+                await enviar_telegram(chat_id, BOAS_VINDAS)
+                return
+
+            if u and u.aguardando_codinome and texto and not texto.startswith("/"):
+                u.codinome = texto[:64]
+                u.aguardando_codinome = False
                 u.username = username or u.username
-                u.aguardando_codinome = True
-            s.commit()
-            await enviar_telegram(chat_id, BOAS_VINDAS)
-            return
+                s.commit()
+                extra = f" ou <b>@{username}</b>" if username else ""
+                await enviar_telegram(
+                    chat_id,
+                    f"Prontinho! Agora a galera pode te mandar correio como "
+                    f"<b>{html.escape(u.codinome)}</b>{extra}.\nBoa festa!")
+                return
 
-        if u and u.aguardando_codinome and texto and not texto.startswith("/"):
-            u.codinome = texto[:64]
-            u.aguardando_codinome = False
-            u.username = username or u.username
-            s.commit()
-            extra = f" ou <b>@{username}</b>" if username else ""
-            await enviar_telegram(
-                chat_id,
-                f"Prontinho! 🎉 Agora a galera pode te mandar correio como "
-                f"<b>{html.escape(u.codinome)}</b>{extra}.\nBoa festa! 🌽💌")
-            return
-
-        await enviar_telegram(chat_id, "Manda /start pra ativar seu correio elegante 💌")
+            await enviar_telegram(chat_id, "Manda /start pra ativar seu correio elegante")
+    except Exception as e:
+        print(f"[bot] erro em tratar_update chat_id={chat_id}: {e}", flush=True)
+        await enviar_telegram(chat_id, "Erro interno. Tente novamente com /start")
 
 async def _bot_loop_async():
     """Loop assincrono do bot — roda em thread propria para evitar conflito de event loop no Windows."""
