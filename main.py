@@ -43,10 +43,12 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # ----------------------------------------------------------------------------
 # Banco de dados
 # ----------------------------------------------------------------------------
-engine = create_engine(
-    DB_URL, echo=False,
-    connect_args={"check_same_thread": False} if DB_URL.startswith("sqlite") else {},
-)
+if DB_URL.startswith("sqlite"):
+    _connect_args = {"check_same_thread": False}
+else:
+    _connect_args = {"sslmode": "require"}
+
+engine = create_engine(DB_URL, echo=False, connect_args=_connect_args)
 
 class Base(DeclarativeBase): pass
 
