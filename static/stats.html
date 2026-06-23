@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Stats — Correio Elegante</title>
+<link rel="manifest" href="/static/manifest.json"/>
+<style>
+:root{
+  --bg:#0d0d1a;--card:#16162a;--accent:#ff6b9d;--gold:#ffd700;--teal:#00e5ff;
+  --text:#f0f0f8;--muted:#8888aa;--border:#2a2a4a;
+  --grad:linear-gradient(135deg,#ff6b9d,#c44dff,#00e5ff);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
+header{background:var(--grad);padding:28px 20px 22px;text-align:center;position:relative;overflow:hidden}
+header::after{content:'';position:absolute;inset:0;background:rgba(0,0,0,.25)}
+header h1{position:relative;z-index:1;font-size:clamp(1.4rem,4vw,2rem);font-weight:800;letter-spacing:.5px}
+header p{position:relative;z-index:1;opacity:.85;margin-top:4px;font-size:.9rem}
+nav{position:relative;z-index:1;margin-top:12px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+nav a{color:#fff;text-decoration:none;background:rgba(255,255,255,.18);padding:5px 14px;border-radius:20px;font-size:.8rem;transition:.2s}
+nav a:hover{background:rgba(255,255,255,.32)}
+main{max-width:960px;margin:0 auto;padding:24px 16px}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:28px}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 16px;text-align:center;transition:.3s}
+.kpi:hover{transform:translateY(-3px);border-color:var(--accent)}
+.kpi .num{font-size:2.4rem;font-weight:900;line-height:1}
+.kpi .lbl{font-size:.78rem;color:var(--muted);margin-top:6px;text-transform:uppercase;letter-spacing:.5px}
+.kpi.c1 .num{color:var(--accent)}
+.kpi.c2 .num{color:var(--gold)}
+.kpi.c3 .num{color:var(--teal)}
+.kpi.c4 .num{color:#a78bfa}
+section{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:20px}
+section h2{font-size:1rem;font-weight:700;margin-bottom:16px;color:var(--accent)}
+/* Barra horizontal */
+.bar-list{display:flex;flex-direction:column;gap:10px}
+.bar-item{display:flex;align-items:center;gap:10px}
+.bar-item .name{flex:0 0 140px;font-size:.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)}
+.bar-track{flex:1;height:18px;background:rgba(255,255,255,.06);border-radius:9px;overflow:hidden}
+.bar-fill{height:100%;border-radius:9px;background:var(--grad);transition:width .7s ease}
+.bar-item .qty{flex:0 0 36px;text-align:right;font-size:.8rem;color:var(--muted)}
+/* Gráfico de horas */
+.hour-chart{display:flex;align-items:flex-end;gap:4px;height:100px;padding:0 2px}
+.hbar{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
+.hbar .fill{width:100%;border-radius:3px 3px 0 0;background:var(--grad);transition:height .7s ease;min-height:2px}
+.hbar .hl{font-size:.6rem;color:var(--muted)}
+/* Entregas breakdown */
+.pie-row{display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+.pie-wrap{position:relative;width:110px;height:110px}
+.pie-wrap canvas{width:110px;height:110px}
+.legend{display:flex;flex-direction:column;gap:8px}
+.leg{display:flex;align-items:center;gap:8px;font-size:.85rem}
+.leg-dot{width:12px;height:12px;border-radius:50%}
+footer{text-align:center;padding:24px;color:var(--muted);font-size:.8rem}
+.refresh-btn{background:rgba(255,107,157,.15);border:1px solid var(--accent);color:var(--accent);padding:6px 16px;border-radius:20px;cursor:pointer;font-size:.8rem;transition:.2s}
+.refresh-btn:hover{background:var(--accent);color:#fff}
+.ts{color:var(--muted);font-size:.75rem;margin-left:10px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinning{animation:spin .6s linear infinite;display:inline-block}
+</style>
+</head>
+<body>
+<header>
+  <h1>📊 Correio Elegante — Analytics</h1>
+  <p>Estatísticas em tempo real da festa</p>
+  <nav>
+    <a href="/">✉️ Barraca</a>
+    <a href="/telao">📺 Telão</a>
+    <a href="/moderacao">🛡️ Moderação</a>
+  </nav>
+</header>
+<main>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px">
+    <span style="font-size:1.05rem;font-weight:700">Visão Geral</span>
+    <div>
+      <button class="refresh-btn" onclick="carregar()">⟳ Atualizar</button>
+      <span class="ts" id="ts"></span>
+    </div>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi c1"><div class="num" id="k-total">—</div><div class="lbl">Correios enviados</div></div>
+    <div class="kpi c2"><div class="num" id="k-entregues">—</div><div class="lbl">Entregues</div></div>
+    <div class="kpi c3"><div class="num" id="k-telegram">—</div><div class="lbl">Via Telegram</div></div>
+    <div class="kpi c4"><div class="num" id="k-reg">—</div><div class="lbl">Registrados</div></div>
+  </div>
+
+  <section>
+    <h2>💌 Top Destinatários</h2>
+    <div class="bar-list" id="top-para"></div>
+  </section>
+
+  <section>
+    <h2>🕐 Correios por Hora</h2>
+    <div class="hour-chart" id="hora-chart"></div>
+  </section>
+
+  <section>
+    <h2>📬 Canal de Entrega</h2>
+    <div class="pie-row">
+      <div class="pie-wrap"><canvas id="pie" width="110" height="110"></canvas></div>
+      <div class="legend">
+        <div class="leg"><div class="leg-dot" style="background:#ff6b9d"></div><span id="leg-tg">Telegram: —</span></div>
+        <div class="leg"><div class="leg-dot" style="background:#00e5ff"></div><span id="leg-lk">Link: —</span></div>
+      </div>
+    </div>
+  </section>
+</main>
+<footer>Correio Elegante — Arraiá TI · Atualiza automático a cada 30s</footer>
+
+<script>
+async function carregar(){
+  const btn=document.querySelector('.refresh-btn');
+  btn.innerHTML='<span class="spinning">⟳</span> Atualizando';
+  try{
+    const d=await fetch('/api/stats').then(r=>r.json());
+    anim('k-total',d.total);
+    anim('k-entregues',d.entregues);
+    anim('k-telegram',d.via_telegram);
+    anim('k-reg',d.registrados);
+    renderTop(d.top_para);
+    renderHoras(d.por_hora,d.total);
+    renderPie(d.via_telegram,d.via_link);
+    document.getElementById('ts').textContent='Atualizado às '+new Date().toLocaleTimeString('pt-BR');
+  }catch(e){console.error(e)}
+  btn.textContent='⟳ Atualizar';
+}
+
+function anim(id,val){
+  const el=document.getElementById(id);
+  const start=parseInt(el.textContent)||0;
+  const end=val||0;
+  const dur=600,step=16;
+  let t=0;
+  const iv=setInterval(()=>{
+    t+=step;
+    el.textContent=Math.round(start+(end-start)*Math.min(t/dur,1));
+    if(t>=dur)clearInterval(iv);
+  },step);
+}
+
+function renderTop(items){
+  const el=document.getElementById('top-para');
+  if(!items||!items.length){el.innerHTML='<p style="color:var(--muted);font-size:.85rem">Nenhum dado ainda.</p>';return}
+  const max=items[0].qtd||1;
+  el.innerHTML=items.map(i=>`
+    <div class="bar-item">
+      <div class="name" title="${i.nome}">${i.nome}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${(i.qtd/max*100).toFixed(1)}%"></div></div>
+      <div class="qty">${i.qtd}</div>
+    </div>`).join('');
+}
+
+function renderHoras(porHora,total){
+  const el=document.getElementById('hora-chart');
+  const vals=[];
+  for(let h=0;h<24;h++) vals.push({h,c:porHora[h]||0});
+  const max=Math.max(...vals.map(v=>v.c),1);
+  el.innerHTML=vals.map(v=>`
+    <div class="hbar" title="${v.h}h: ${v.c} correios">
+      <div class="fill" style="height:${Math.max(v.c/max*94,2).toFixed(1)}px"></div>
+      <div class="hl">${v.h%4===0?v.h+'h':''}</div>
+    </div>`).join('');
+}
+
+function renderPie(tg,lk){
+  document.getElementById('leg-tg').textContent=`Telegram: ${tg}`;
+  document.getElementById('leg-lk').textContent=`Link: ${lk}`;
+  const c=document.getElementById('pie');
+  const ctx=c.getContext('2d');
+  const total=tg+lk||1;
+  ctx.clearRect(0,0,110,110);
+  const cx=55,cy=55,r=48;
+  const slices=[
+    {val:tg,color:'#ff6b9d'},
+    {val:lk,color:'#00e5ff'},
+  ];
+  let angle=-Math.PI/2;
+  slices.forEach(sl=>{
+    const sweep=sl.val/total*Math.PI*2;
+    ctx.beginPath();ctx.moveTo(cx,cy);
+    ctx.arc(cx,cy,r,angle,angle+sweep);
+    ctx.closePath();ctx.fillStyle=sl.color;ctx.fill();
+    angle+=sweep;
+  });
+  ctx.beginPath();ctx.arc(cx,cy,28,0,Math.PI*2);ctx.fillStyle='#16162a';ctx.fill();
+  ctx.fillStyle='#f0f0f8';ctx.font='bold 14px Segoe UI';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(tg+lk,cx,cy);
+}
+
+carregar();
+setInterval(carregar,30000);
+</script>
+</body>
+</html>

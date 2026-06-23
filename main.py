@@ -13,6 +13,7 @@ Rode com:  uvicorn main:app --reload
 Veja o README.md para criar o bot e colocar online.
 """
 import os, secrets, asyncio, html, re, json, threading, time
+from collections import defaultdict, Counter
 from contextlib import asynccontextmanager
 from datetime import datetime
 
@@ -39,6 +40,19 @@ if DB_URL.startswith("postgresql://") and "+psycopg2" not in DB_URL:
 
 API = f"https://api.telegram.org/bot{TOKEN}"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# ----------------------------------------------------------------------------
+# Rate limiting — máx 5 correios por IP por minuto
+# ----------------------------------------------------------------------------
+_rl: dict = defaultdict(list)
+
+def _checar_rate(ip: str) -> bool:
+    agora = time.time()
+    _rl[ip] = [t for t in _rl[ip] if agora - t < 60]
+    if len(_rl[ip]) >= 5:
+        return False
+    _rl[ip].append(agora)
+    return True
 
 # ----------------------------------------------------------------------------
 # Banco de dados
@@ -158,11 +172,11 @@ async def tratar_update(upd: dict):
                 extra = f" ou <b>@{username}</b>" if username else ""
                 await enviar_telegram(
                     chat_id,
-                    f"Prontinho! Agora a galera pode te mandar correio como "
-                    f"<b>{html.escape(u.codinome)}</b>{extra}.\nBoa festa!")
+                    f"Prontinho! \U0001f389 Agora a galera pode te mandar correio como "
+                    f"<b>{html.escape(u.codinome)}</b>{extra}.\nBoa festa! \U0001f33d\U0001f48c")
                 return
 
-            await enviar_telegram(chat_id, "Manda /start pra ativar seu correio elegante")
+            await enviar_telegram(chat_id, "Manda /start pra ativar seu correio elegante \U0001f48c")
     except Exception as e:
         print(f"[bot] erro em tratar_update chat_id={chat_id}: {e}", flush=True)
         await enviar_telegram(chat_id, "Erro interno. Tente novamente com /start")
@@ -262,12 +276,15 @@ async def criar_correio(c: CorreioIn, request: Request):
     if not remetente:
         raise HTTPException(400, "Identifique quem está enviando (registro interno).")
 
+    ip = (request.headers.get("x-forwarded-for", "").split(",")[0].strip()
+          or (request.client.host if request.client else ""))
+    if not _checar_rate(ip):
+        raise HTTPException(429, "Muitos correios enviados. Aguarde 1 minuto.")
+
     bloqueado, termos = analisar(msg)
     de = "Anônimo 🎭" if c.anonimo else (c.de.strip() or "Anônimo 🎭")
 
     # registro de origem (privado, só aparece na moderação)
-    ip = (request.headers.get("x-forwarded-for", "").split(",")[0].strip()
-          or (request.client.host if request.client else ""))
     ua = request.headers.get("user-agent", "")[:300]
 
     with Session(engine) as s:
@@ -319,9 +336,36 @@ def telao_dados():
         entregues = sum(1 for c in cs if c.entregue)
         registrados = s.scalar(select(func.count()).select_from(Usuario)) or 0
         feed = [{"codigo": c.codigo, "para": c.para, "via": c.via,
-                 "entregue": c.entregue} for c in cs[:25]]
+                 "entregue": c.entregue,
+                 "criado_em": c.criado_em.isoformat() if c.criado_em else None}
+                for c in cs[:25]]
         return {"total": total, "entregues": entregues,
                 "registrados": registrados, "feed": feed}
+
+@app.get("/api/ping")
+def ping():
+    return {"status": "ok", "timestamp": datetime.utcnow().isoformat()}
+
+@app.get("/api/stats")
+def api_stats():
+    """Estatísticas públicas para a página de analytics."""
+    with Session(engine) as s:
+        cs = s.scalars(select(Correio).where(Correio.oculto == False)).all()  # noqa: E712
+        total = len(cs)
+        via_telegram = sum(1 for c in cs if c.via == "telegram")
+        entregues = sum(1 for c in cs if c.entregue)
+        registrados = s.scalar(select(func.count()).select_from(Usuario)) or 0
+        top_para = Counter(c.para for c in cs).most_common(10)
+        por_hora = Counter(c.criado_em.hour for c in cs if c.criado_em)
+        return {
+            "total": total,
+            "entregues": entregues,
+            "via_telegram": via_telegram,
+            "via_link": total - via_telegram,
+            "registrados": registrados,
+            "top_para": [{"nome": n, "qtd": q} for n, q in top_para],
+            "por_hora": {str(h): c for h, c in sorted(por_hora.items())},
+        }
 
 @app.get("/api/info")
 async def info():
@@ -411,5 +455,7 @@ def p_telao():     return pagina("telao.html")
 def p_moderacao(): return pagina("moderacao.html")
 @app.get("/ativar")       # QR de ativação do bot (tela cheia, imprimível)
 def p_ativar():    return pagina("ativar.html")
+@app.get("/stats")        # página pública de analytics
+def p_stats():     return pagina("stats.html")
 @app.get("/c/{codigo}")  # envelope que a pessoa abre
 def p_reveal(codigo: str): return pagina("reveal.html")
