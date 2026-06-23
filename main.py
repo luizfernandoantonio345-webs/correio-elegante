@@ -21,7 +21,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, StreamingResponse
 from filtro import analisar
 from pydantic import BaseModel
-from sqlalchemy import (create_engine, String, Integer, Boolean, DateTime, Text,
+from sqlalchemy import (create_engine, String, Integer, BigInteger, Boolean, DateTime, Text,
                         select, func)
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, Session
 
@@ -54,7 +54,7 @@ class Base(DeclarativeBase): pass
 
 class Usuario(Base):
     __tablename__ = "usuarios"
-    chat_id:   Mapped[int]  = mapped_column(Integer, primary_key=True)
+    chat_id:   Mapped[int]  = mapped_column(BigInteger, primary_key=True)
     username:  Mapped[str]  = mapped_column(String(64), default="")
     codinome:  Mapped[str]  = mapped_column(String(64), default="")
     aguardando_codinome: Mapped[bool] = mapped_column(Boolean, default=True)
@@ -204,6 +204,7 @@ def _bot_thread():
 # ----------------------------------------------------------------------------
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    Base.metadata.drop_all(engine)   # recria tabelas com schema correto (BigInteger)
     Base.metadata.create_all(engine)
     if TOKEN:
         t = threading.Thread(target=_bot_thread, daemon=True)
