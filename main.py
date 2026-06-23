@@ -204,7 +204,6 @@ def _bot_thread():
 # ----------------------------------------------------------------------------
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    Base.metadata.drop_all(engine)   # recria tabelas com schema correto (BigInteger)
     Base.metadata.create_all(engine)
     if TOKEN:
         t = threading.Thread(target=_bot_thread, daemon=True)
